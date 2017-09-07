@@ -84,7 +84,7 @@
         break;
       }
     }
-    var bg = 'url(/img/' + imgName + '-' + size + '.jpg)';
+    var bg = 'url(' + imgName + '-' + size + '.jpg)';
     header.style.backgroundImage = bg;
   }
 

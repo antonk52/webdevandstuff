@@ -22,17 +22,7 @@ layout: default
     <ul>
       {% for post in site.posts limit:3 %}
         <li>
-          <a href="{{ post.url }}">{{ post.title }}</a>
-        </li>
-      {% endfor %}
-    </ul>
-  </aside>
-  <aside id="categories-2" class="widget widget_categories">
-    <h1 class="widget-title">Categories</h1>
-    <ul>
-      {% for cat in site.categories %}
-        <li class="cat-item">
-          <a href="{{ cat.url }}">{{ cat | first | capitalize }}</a>
+          <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
         </li>
       {% endfor %}
     </ul>

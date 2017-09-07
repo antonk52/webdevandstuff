@@ -2,7 +2,7 @@
 title: Web Dev & Stuff
 email: your-email@domain.com
 description: My name is Anton and I am a front end developer. This website is nothing but a place where I can pile up the solutions to web related problems I have not found a solution as well my thoughts that are longer than 140 characters.
-baseurl: "" # the subpath of your site, e.g. /blog
+baseurl: "/webdevandstuff" # the subpath of your site, e.g. /blog
 url: "http://webdevandstuff.com" # the base hostname & protocol for your site
 twitter_username: antonk52
 github_username:  antonk52

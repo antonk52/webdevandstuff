@@ -2,7 +2,7 @@
   id="masthead"
   role="banner"
   class="site-head site-header"
-data-background="{% if page.is_post %}{{ page.img }}{% else %}bg{% endif %}">
+data-background="{{ site.baseurl }}/img/{% if page.is_post %}{{ page.img }}{% else %}bg{% endif %}">
 
     <nav id="site-navigation" class="main-navigation" role="navigation">
         <div>
@@ -15,7 +15,7 @@ data-background="{% if page.is_post %}{{ page.img }}{% else %}bg{% endif %}">
               <ul id="menu-my-menu" class="menu nav-menu">
                 {% for item in site.menu %}
                   <li class="menu-item">
-                    <a href="{{ item.link }}">{{ item.title }}</a>
+                    <a href="{{ site.baseurl }}{{ item.link }}">{{ item.title }}</a>
                   </li>
                 {% endfor %}
               </ul>
@@ -32,7 +32,7 @@ data-background="{% if page.is_post %}{{ page.img }}{% else %}bg{% endif %}">
         <div class="vertical">
           <div class="site-head-content inner">
             <h1 class="post-title">{{ page.title }}</h1>
-            <h2 class="post-meta">{{ page.date | date: "%b %-d, %Y" }} | 5 min read</h2>
+            <h2 class="post-meta">{{ page.date | date: "%b %-d, %Y" }}</h2>
           </div>
         </div>
       </div>
