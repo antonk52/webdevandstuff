@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  {% include head.html %}
+
+  <body>
+
+    {% include header.html %}
+
+    <main class="content" id="content" role="main">
+      {{ content }}
+    </main>
+
+    {% include footer.html %}
+
+    <script src="{{ "/js/main.js" | prepend: site.baseurl }}" type="text/javascript" async></script>
+  </body>
+
+</html>

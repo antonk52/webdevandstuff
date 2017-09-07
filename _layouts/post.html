@@ -1,0 +1,41 @@
+---
+layout: default
+---
+
+<article class="page type-page hentry">
+  <section class="post-content">
+    {{ content }}
+  </section>
+  <footer class="post-footer">
+    <section class="author">
+      <img alt="" src="https://secure.gravatar.com/avatar/8f0cc7f3664017402e1d1499f5ee20ca?s=100&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/8f0cc7f3664017402e1d1499f5ee20ca?s=200&amp;d=mm&amp;r=g 2x" class="avatar avatar-100 photo" height="100" width="100" style="opacity: 1;">
+      <h4>AntonK52</h4>
+      <p>{{ site.description }}</p>
+      <div class="clear">&nbsp;</div>
+    </section>
+  </footer>
+</article>
+
+<div id="secondary" class="widget-area" role="complementary">
+  <aside id="recent-posts-2" class="widget widget_recent_entries">
+    <h1 class="widget-title">What is new?</h1>
+    <ul>
+      {% for post in site.posts limit:3 %}
+        <li>
+          <a href="{{ post.url }}">{{ post.title }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </aside>
+  <aside id="categories-2" class="widget widget_categories">
+    <h1 class="widget-title">Categories</h1>
+    <ul>
+      {% for cat in site.categories %}
+        <li class="cat-item">
+          <a href="{{ cat.url }}">{{ cat | first | capitalize }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </aside>
+  <div class="clear">&nbsp;</div>
+</div>

@@ -1,0 +1,33 @@
+---
+title: Web Dev & Stuff
+layout: default
+---
+
+{% for post in site.posts %}
+  <article class="post type-post status-publish format-standard has-post-thumbnail hentry">
+    <header class="post-header">
+      <h3 class="post-title">
+        <a href="{{ post.url }}" rel="bookmark">{{ post.title }}</a>
+      </h3>
+      <span class="post-meta">
+      <span class="posted-on">
+        <time class="entry-date">{{ post.date | date: "%B %-d, %Y" }}</time>
+      </span>
+      <span class="byline">On {{ post.categories | first | capitalize }}</span>
+      <div class="post-image">
+        <a href="{{ post.url }}" rel="bookmark">
+          <img data-src="
+            <360:/img/{{ post.img }}-300x125.jpg, 
+            <768:/img/{{ post.img }}-360x150.jpg, 
+            >720:/img/{{ post.img }}-720x300.jpg" alt="A lot of people by a river talking" title="talk">
+        </a>
+      </div>
+    </header>
+    <section class="post-content">
+      <p>{{ post.experpt }}</p>
+      <div class="clear">&nbsp;</div>
+    </section>
+  </article>
+    <span class="post-meta"></span>
+{% endfor %}
+

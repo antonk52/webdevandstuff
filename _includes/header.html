@@ -1,0 +1,51 @@
+<header
+  id="masthead"
+  role="banner"
+  class="site-head site-header"
+data-background="{% if page.is_post %}{{ page.img }}{% else %}bg{% endif %}">
+
+    <nav id="site-navigation" class="main-navigation" role="navigation">
+        <div>
+            <h1 class="menu-toggle">
+              <a class="" href="#">
+                <span class="">Menu</span>
+              </a>
+            </h1>
+            <div class="menu-my-menu-container">
+              <ul id="menu-my-menu" class="menu nav-menu">
+                {% for item in site.menu %}
+                  <li class="menu-item">
+                    <a href="{{ item.link }}">{{ item.title }}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% if page.is_post %}
+      <div class="post-page-creds">
+        <a href="/" class="blog-name">Web Dev & Stuff</a><br>
+        <p class="blog-desc">by @AntonK52</p>
+      </div>
+      <div class="vertical-row">
+        <div class="vertical">
+          <div class="site-head-content inner">
+            <h1 class="post-title">{{ page.title }}</h1>
+            <h2 class="post-meta">{{ page.date | date: "%b %-d, %Y" }} | 5 min read</h2>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="vertical-row">
+        <div class="vertical">
+          <div class="site-head-content inner">
+            <h1 class="blog-title"><a class="blog-logo" href='/' rel='home'>Web Dev and Stuff</a></h1>
+            <h2 class="blog-description">by <a target="_blank" href="https://twitter.com/antonk52">@antonk52</a></h2>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+</header>
+
