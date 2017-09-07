@@ -151,7 +151,6 @@
         var links = document.querySelectorAll('li > a.work-link');
         each(links, function(el) {
           el.addEventListener('mouseover', function(screenWidth) {
-            console.log('moused over', screenWidth.currentTarget);
             sample.classList.remove('visible');
             var dat = screenWidth.target.attributes['data-id'].value;
             document.getElementById('work-modal-m-' + dat).classList.add('visible');
