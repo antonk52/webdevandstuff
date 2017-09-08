@@ -244,6 +244,10 @@ article.post:last-of-type:after {
   padding: 10px;
 }
 
+.site-footer svg {
+  max-width: 100%;
+}
+
 .site-footer a.twitter-link path {
   transition: fill .3s;
 }
