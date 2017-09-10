@@ -3,7 +3,7 @@ layout: post
 title:  "WP-CLI with MAMP on OS X"
 categories: dev
 img: mamp
-experpt: WP-CLI with MAMP <code>error establishing connection to the database fix</code>
+excerpt: WP-CLI with MAMP <code>error establishing connection to the database fix</code>
 ---
 
 ## wp-cli

@@ -3,7 +3,7 @@ layout: post
 categories: thoughts
 date: 2016-09-21 20:00:00 +0100
 img: meetup
-experpt: Benefits of attending development meetups.
+excerpt: Benefits of attending development meetups.
 ---
 
 ## Meetups why and how

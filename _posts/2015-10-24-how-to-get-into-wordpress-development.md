@@ -2,7 +2,7 @@
 layout: post
 title: "How to get into wordpress development?"
 img: books
-experpt: My personal wordpress challenge. How & Why?
+excerpt: My personal wordpress challenge. How & Why?
 ---
 
 ## Why wordpress?

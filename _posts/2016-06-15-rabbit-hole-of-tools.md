@@ -2,7 +2,7 @@
 layout: post
 categories: thoughts
 img: tools
-experpt: Frameworks, CMS, build systems, text editors, OS', sounds familiar?
+excerpt: Frameworks, CMS, build systems, text editors, OS', sounds familiar?
 ---
 
 As a developer, you probably have ran into a situation where setting up the project environment takes longer than completing the project? If you did. You will likely find useful what you read below otherwise please go and look at <a href="http://imgur.com/search?q=cats">funny cat pictures</a> for the next 3 minutes.
