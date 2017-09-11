@@ -11,6 +11,10 @@
       {{ content }}
     </main>
 
+    {% if page.layout == "default" and page.home_page != true %}
+      {% include latest-posts.html %}
+    {% endif %}
+
     {% include footer.html %}
 
     <script src="{{ "/js/main.js" | prepend: site.baseurl }}" type="text/javascript" async></script>
