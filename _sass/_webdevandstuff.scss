@@ -329,7 +329,7 @@ article.post:last-of-type:after {
 }
 
 .menu-toggle span:after {
-  transform: rotate(0) translateY(8px);
+  transform: rotate(0) translateY(-24px);
 }
 
 .main-navigation.toggled .menu-toggle span {
@@ -341,7 +341,7 @@ article.post:last-of-type:after {
 }
 
 .main-navigation.toggled .menu-toggle span:after {
-  transform: rotate(-45deg) translateY(-2px);
+  transform: rotate(-45deg) translate(23px, -24px);
 }
 
 nav.main-navigation {

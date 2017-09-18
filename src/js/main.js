@@ -95,7 +95,7 @@
     if (!container)
       return;
 
-    button = container.getElementsByTagName('h1')[0];
+    button = container.querySelector('.menu-toggle');
     if ('undefined' === typeof button)
       return;
 
