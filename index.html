@@ -11,10 +11,11 @@ home_page: true
         <a href="{{ site.baseurl }}{{ post.url }}" rel="bookmark">{{ post.title }}</a>
       </h3>
       <span class="post-meta">
-      <span class="posted-on">
-        <time class="entry-date">{{ post.date | date: "%B %-d, %Y" }}</time>
+        <span class="posted-on">
+          <time class="entry-date">{{ post.date | date: "%B %-d, %Y" }}</time>
+        </span>
+        <span class="byline">On {{ post.categories | first | capitalize }}</span>
       </span>
-      <span class="byline">On {{ post.categories | first | capitalize }}</span>
       <div class="post-image">
         <a href="{{ site.baseurl }}{{ post.url }}" rel="bookmark">
           <img data-src="
@@ -29,6 +30,5 @@ home_page: true
       <div class="clear">&nbsp;</div>
     </section>
   </article>
-    <span class="post-meta"></span>
 {% endfor %}
 
