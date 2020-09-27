@@ -3,8 +3,15 @@
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "build": "ts-node ./build.ts"
+  },
   "author": "antonk52",
   "license": "ISC",
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/node": "^14.11.2",
+    "front-matter": "^4.0.2",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.3"
+  }
 }

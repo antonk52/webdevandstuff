@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "alwaysStrict": true,
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "lib": ["es2017"],
+        "noFallthroughCasesInSwitch": true,
+        "noUnusedParameters": false,
+        "noErrorTruncation": true,
+        "strict": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "declaration": true,
+
+        "target": "es6",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "rootDir": "./",
+        "outDir": "./dist",
+        "baseUrl": "./"
+    },
+    "input": ["./build.ts"]
+}
