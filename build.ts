@@ -58,8 +58,9 @@ async function main() {
             const list = notes
                 .map(
                     note =>
-                        `<li><a href="${path.join(
-                            PATHS.wiki,
+                        `<li><a href="./${path.join(
+                            '.',
+                            'wiki',
                             note.filepath,
                         )}">${note.title}</a></li>`,
                 )
