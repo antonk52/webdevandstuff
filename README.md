@@ -38,6 +38,12 @@
 </ul>
 </details>
 
+<details><summary>twitch (1)</summary>
+<ul>
+<li><a href="./wiki/twitch-notes.md">Twitch related stuff</a></li>
+</ul>
+</details>
+
 <details><summary>vim (1)</summary>
 <ul>
 <li><a href="./wiki/vim-startup-performance.md">Vim startup performance</a></li>
