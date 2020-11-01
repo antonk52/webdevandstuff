@@ -44,6 +44,12 @@
 </ul>
 </details>
 
+<details><summary>typescript (1)</summary>
+<ul>
+<li><a href="./wiki/typescript-learning-resources.md">Typescript - learning resources</a></li>
+</ul>
+</details>
+
 <details><summary>vim (1)</summary>
 <ul>
 <li><a href="./wiki/vim-startup-performance.md">Vim startup performance</a></li>
