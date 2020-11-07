@@ -15,7 +15,11 @@ tags: [twitch]
 
 ## Resources
 
-- [Encoding and bitrate suggestions from twitch](https://stream.twitch.tv/encoding/)
+- [Encoding and bitrate suggestions from twitch](https://stream.twitch.tv/encoding/)<br/>
+    **TLDR**<br/>
+    1080px/30fps - 4500 kb/s<br/>
+    720px/30fps - 3500 kb/s
 - [Stream elements](https://streamelements.com/dashboard)
     Chat bots & commands, reactions to followers and such.
 - GTA-like wasted overlay [link](https://www.velosofy.com/template/gta-5-wasted-effect-transparent-template-free-to-use-xuo5psq9kyc)
+- [ios camera app with no ui](https://apps.apple.com/us/app/shuttercast/id1510249252)
