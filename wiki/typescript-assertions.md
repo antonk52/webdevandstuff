@@ -4,7 +4,7 @@ tags: [typescript]
 
 # Typescript assertions
 
-The below implies that you've already read the [type assertions](https://www.typescriptlang.org/docs/handbook/basic-types.html#type-assertions) section in typescript documentation.
+The below implies that you have already read the [type assertions](https://www.typescriptlang.org/docs/handbook/basic-types.html#type-assertions) section in typescript documentation.
 
 ## List of content
 
@@ -17,7 +17,7 @@ The below implies that you've already read the [type assertions](https://www.typ
 
 Added in [v1.6](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-1-6.html#new-tsx-file-extension-and-as-operator)
 
-This operator allows you to explicitly cast the type for a value of a different type without typescript to raise an error. This is a dangerous a foot gun like feature that should be used with care and consciously. To quote the typescript docs this is a way to tell the compiler `trust me, I know what I’m doing.`
+This operator allows you to explicitly cast the type for a value of a different type without typescript raising an error. This is a dangerous a foot gun like feature that should be used with care and consciously. To quote the typescript docs this is a way to tell the compiler `trust me, I know what I’m doing.`
 
 This feature has two ways to use it.
 
@@ -53,7 +53,7 @@ const constObjAlt = <const>{a: 1, b: 'foo'};
 constObj; // {readonly a: 1; readonly b: 'foo'}
 ```
 
-This is **not** the same as using Object.freeze
+This is **not** the same as using `Object.freeze`
 
 ```ts
 const constObj = {a: 1, b: 'foo', c: {d: 'bar'}} as const;
@@ -63,8 +63,9 @@ constObj; // {readonly a: 1, readonly b: 'foo', readonly c: {readonly d: 'bar}}
 // @ts-expect-error Cannot assign to 'd' because it is a read-only property.
 constObj.c.d = 'foo'
 
-
 const frozen = Object.freeze({a: 1, b: 'foo', c: {d: 'bar'}})
+
+frozen; // Readonly<{a: number; b: string; c: {d: string}}>
 
 // @ts-expect-error Cannot assign to 'b' because it is a read-only property.
 frozen.b = 'foo 2'
@@ -82,7 +83,8 @@ The key things that happen when const assertions are being used are:
 ## Assert functions
 
 Added in [v3.7](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions)
-Assert functions are similar to `type guards` with the only difference that the function will throw instead of returning a falsy value. This works on par with nodejs [`assert`](https://nodejs.org/docs/latest/api/assert.html) module.
+
+Assert functions are similar to `type guards` with the only difference that the function throws instead of returning a falsy value. This works on par with nodejs [`assert`](https://nodejs.org/docs/latest/api/assert.html) module.
 
 Using assert function you can validate an input ie
 
@@ -104,7 +106,7 @@ function foo(input: boolean, item: string | null) {
 }
 ```
 
-Alternatevely you can narrow down the type to be more specific. This is when the similarity with `type guards` shows.
+Alternatively you can narrow down the type to be more specific. This is when the similarity with `type guards` shows.
 
 ```ts
 function specificAssertion(arg: unknown): asserts arg is string {
@@ -165,7 +167,7 @@ type KindlessCircle = RemoveKindField<Circle>;
 //   }
 ```
 
-This will get you the same result
+This gets you the same result
 
 ```ts
 type RemoveKindField<T> = {
