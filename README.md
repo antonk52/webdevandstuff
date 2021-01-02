@@ -44,8 +44,9 @@
 </ul>
 </details>
 
-<details><summary>typescript (1)</summary>
+<details><summary>typescript (2)</summary>
 <ul>
+<li><a href="./wiki/typescript-assertions.md">Typescript assertions</a></li>
 <li><a href="./wiki/typescript-learning-resources.md">Typescript - learning resources</a></li>
 </ul>
 </details>
