@@ -33,7 +33,7 @@ This section is meant for those who have worked with typescript and understands 
 
     Read all posts in this section. This should help with advanced & utility types for non trivial cases.
 
-- [Release notes](https://www.typescriptlang.org/docs/handbook/advanced-types.html)
+- [Release notes](https://www.typescriptlang.org/docs/handbook/release-notes/overview.html)
 
     Though typescript documentation is pretty good, the gold mine is the release notes. This is where you can find the expanded versions of the added features. If you want to better understand the spectrum of the the applicable scenarios for these features it is a good idea to binge read the release notes starting from [version 2.0](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html) and above.
 
