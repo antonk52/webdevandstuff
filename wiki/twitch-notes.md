@@ -23,3 +23,7 @@ tags: [twitch]
     Chat bots & commands, reactions to followers and such.
 - GTA-like wasted overlay [link](https://www.velosofy.com/template/gta-5-wasted-effect-transparent-template-free-to-use-xuo5psq9kyc)
 - [ios camera app with no ui](https://apps.apple.com/us/app/shuttercast/id1510249252)
+
+## Notes
+
+- OBS video preview can be disabled to not bother a lower the load during a stream
