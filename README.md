@@ -8,6 +8,12 @@
 </ul>
 </details>
 
+<details><summary>flow (1)</summary>
+<ul>
+<li><a href="./wiki/flow-to-typescript-notes.md">Flow to typescript migration notes</a></li>
+</ul>
+</details>
+
 <details><summary>json (1)</summary>
 <ul>
 <li><a href="./wiki/yaml-for-openapi-or-swagger.md">Why Yaml is a bad choice for handwritten openapi/swagger schemas</a></li>
@@ -44,8 +50,9 @@
 </ul>
 </details>
 
-<details><summary>typescript (2)</summary>
+<details><summary>typescript (3)</summary>
 <ul>
+<li><a href="./wiki/flow-to-typescript-notes.md">Flow to typescript migration notes</a></li>
 <li><a href="./wiki/typescript-assertions.md">Typescript assertions</a></li>
 <li><a href="./wiki/typescript-learning-resources.md">Typescript - learning resources</a></li>
 </ul>

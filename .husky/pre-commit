@@ -1,0 +1,7 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+npm run generate-content-by-tags
+
+# Stage readme within the same commit
+git add ./README.md
