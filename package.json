@@ -4,13 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "ts-node ./build.ts"
+    "generate-content-by-tags": "ts-node ./build.ts"
   },
   "author": "antonk52",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^14.11.2",
     "front-matter": "^4.0.2",
+    "husky": "^6.0.0",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.3"
   }
