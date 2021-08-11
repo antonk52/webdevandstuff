@@ -355,6 +355,8 @@ if (func()) { // ok
 ```
 
 ```typescript
+// typescript
+
 const func
     : (arg: string) => void
     = (arg) => console.log(arg)
@@ -717,7 +719,7 @@ function func(value: { prop?: string }) {
 Once we checked for `value.prop` value, the refined type is string. However if we call something within the current scope. Flow invalidated the refinement since it is possible that the object `value` was mutated within `otherMethod`. To avoid the invalidation one can extract the primitive value into its own variable ie
 
 ```typescript
-// typescript
+// @flow
 function func(value: { prop?: string }) {
     if (value.prop) {
         const {prop} = value
