@@ -20,6 +20,24 @@
 </ul>
 </details>
 
+<details><summary>lua (1)</summary>
+<ul>
+<li><a href="./wiki/neovim-lua-plugins.md">Neovim lua plugins learning resources</a></li>
+</ul>
+</details>
+
+<details><summary>mentoring (1)</summary>
+<ul>
+<li><a href="./wiki/guide-for-mentoring.md">Guide for mentoring</a></li>
+</ul>
+</details>
+
+<details><summary>neovim (1)</summary>
+<ul>
+<li><a href="./wiki/neovim-lua-plugins.md">Neovim lua plugins learning resources</a></li>
+</ul>
+</details>
+
 <details><summary>openapi (1)</summary>
 <ul>
 <li><a href="./wiki/yaml-for-openapi-or-swagger.md">Why Yaml is a bad choice for handwritten openapi/swagger schemas</a></li>
