@@ -62,6 +62,12 @@
 </ul>
 </details>
 
+<details><summary>touch-typing (1)</summary>
+<ul>
+<li><a href="./wiki/touch-typing-sources.md">Resources for touch typing practice</a></li>
+</ul>
+</details>
+
 <details><summary>twitch (1)</summary>
 <ul>
 <li><a href="./wiki/twitch-notes.md">Twitch related stuff</a></li>
