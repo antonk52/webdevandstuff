@@ -24,6 +24,7 @@ type ItemEntry = {
     href: string;
     title: string;
     excerpt: string;
+    date: string;
     html: string;
 }
 
@@ -41,7 +42,7 @@ type ItemEntry = {
 
     // read the posts folder
     console.log('> reading posts');
-    const posts = await fs.promises.readdir(SRC_POSTS).then(x => x.sort());
+    const posts = await fs.promises.readdir(SRC_POSTS).then(x => x.sort().reverse());
 
     console.log('> creating posts');
     const postEntries: ItemEntry[] = [];
@@ -53,6 +54,11 @@ type ItemEntry = {
 
         assert.ok(parsed.data.title, `Post "${post}" is missing "title" fornt matter`);
         assert.ok(parsed.data.excerpt, `Post "${post}" is missing "exerpt" fornt matter`);
+        let date = undefined;
+        if (/^\d\d\d\d-\d\d-\d\d-/.test(post)) {
+            date = post.slice(0, 10);
+        }
+        assert.ok(date, `Post "${post}" does not start from YYYY-MM-DD or is missing "date" front matter`);
 
         await fs.promises.writeFile(
             path.resolve(DIST_POSTS, post.replace('.md', '.html')),
@@ -61,6 +67,7 @@ type ItemEntry = {
         postEntries.push({
             href: `/post/${post.replace('.md', '.html')}`,
             title: parsed.data.title,
+            date: date ?? parsed.data.date,
             excerpt: parsed.data.excerpt,
             html,
         })
@@ -77,19 +84,24 @@ type ItemEntry = {
         const parsed = matter(wikiContent);
         const html = await marked(parsed.content);
 
-        assert.ok(parsed.data.title, `Wiki "${wiki}" is missing "title" fornt matter`);
-        // assert.ok(parsed.data.excerpt, `Wiki "${wiki}" is missing "exerpt" fornt matter`);
+        assert.ok(parsed.data.title, `Wiki "${wiki}" is missing "title" front matter`);
+        // assert.ok(parsed.data.excerpt, `Wiki "${wiki}" is missing "exerpt" front matter`);
 
         await fs.promises.writeFile(
             path.resolve(DIST_WIKI, wiki.replace('.md', '.html')),
             surroundWithHtml(html, parsed.data),
         );
 
+        const date = cp.execSync(
+            `git log --diff-filter=A --format="%ad" --date=format:"%Y-%m-%d" -- ${SRC_WIKI}/${wiki}`
+        ).toString().trim();
+
         wikiEntries.push({
             href: `/wiki/${wiki.replace('.md', '.html')}`,
             title: parsed.data.title,
             excerpt: parsed.data.excerpt,
             html,
+            date,
         })
     }
 
@@ -126,7 +138,8 @@ type ItemEntry = {
 
 function printEntrys(entries: ItemEntry[], isDev: boolean) {
     return entries
-        .map(entry => `<li><a href="${isDev ? '' : '/webdevandstuff'}${entry.href}">${entry.title}</a></li>`);
+        .sort((a, b) => a.date < b.date ? 1 : -1)
+        .map(entry => `<li><a href="${isDev ? '' : '/webdevandstuff'}${entry.href}">${entry.title}</a>${entry.date ? ` - ${entry.date}` : ''}</li>`);
 }
 
 function surroundWithHtml(content: string, data: PostMeta) {
