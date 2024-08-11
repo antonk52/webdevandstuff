@@ -11,6 +11,19 @@ const DIST_WIKI = path.resolve(__dirname, '../dist/wiki');
 const SRC_POSTS = path.resolve(__dirname, '../posts');
 const SRC_WIKI = path.resolve(__dirname, '../wiki');
 
+type PostMeta = {
+    title?: string;
+    date?: string;
+    excerpt?: string;
+}
+
+type ItemEntry = {
+    href: string;
+    title: string;
+    excerpt: string;
+    html: string;
+}
+
 (async function main() {
     console.log('> creating dist folder');
     if (fs.existsSync(DIST_FOLDER)) {
@@ -26,7 +39,7 @@ const SRC_WIKI = path.resolve(__dirname, '../wiki');
     const posts = await fs.promises.readdir(SRC_POSTS).then(x => x.sort());
 
     console.log('> creating posts');
-    const postEntries = [];
+    const postEntries: ItemEntry[] = [];
     for (const post of posts) {
         const postContent = await fs.promises.readFile(path.resolve(SRC_POSTS, post), 'utf-8');
 
@@ -52,7 +65,7 @@ const SRC_WIKI = path.resolve(__dirname, '../wiki');
     const wikis = await fs.promises.readdir(SRC_WIKI).then(x => x.sort());
     console.log('> creating wiki');
 
-    const wikiEntries = [];
+    const wikiEntries: ItemEntry[] = [];
     for (const wiki of wikis) {
         const wikiContent = await fs.promises.readFile(path.resolve(SRC_WIKI, wiki), 'utf-8');
 
@@ -77,31 +90,33 @@ const SRC_WIKI = path.resolve(__dirname, '../wiki');
 
     console.log('> creating home page index.html');
     {
+        const content = [
+            '<h2>Posts</h2>',
+            '<ul>',
+            ...postEntries.map(printListEntry),
+            '</ul>',
+            '<h2>Wiki</h2>',
+            '<ul>',
+            ...wikiEntries.map(printListEntry),
+            '</ul>',
+        ].join('');
         await fs.promises.writeFile(
             path.resolve(DIST_FOLDER, 'index.html'),
-            surroundWithHtml(`
-<h2>Posts</h2>
-<ul>
-    ${postEntries.map(post => `<li><a href="${post.href}">${post.title}</a></li>`).join('\n')}
-</ul>
-<h2>Wiki</h2>
-<ul>
-    ${wikiEntries.map(wiki => `<li><a href="${wiki.href}">${wiki.title}</a></li>`).join('\n')}
-</ul>
-`, {
-                title: "Web dev and stuff",
-                excerpt: "A collection of posts and wiki entries about web development and other stuff.",
-            }),
+            surroundWithHtml(
+                content,
+                {
+                    title: "Web dev and stuff",
+                    excerpt: "A collection of posts and wiki entries about web development and other stuff.",
+                },
+            ),
         );
     }
 
     console.log('> done');
 })()
 
-type PostMeta = {
-    title?: string;
-    date?: string;
-    excerpt?: string;
+function printListEntry(entry: ItemEntry) {
+    return `<li><a href="/webdevandstuff${entry.href}">${entry.title}</a></li>`;
 }
 
 function surroundWithHtml(content: string, data: PostMeta) {
