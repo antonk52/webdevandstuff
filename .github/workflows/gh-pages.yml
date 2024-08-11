@@ -3,7 +3,6 @@ name: GitHub Pages
 on:
   push:
     branches:
-      - main  # Set a branch name to trigger deployment
       - master
   pull_request:
 
