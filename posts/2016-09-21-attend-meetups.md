@@ -3,7 +3,7 @@ layout: post
 categories: thoughts
 date: 2016-09-21 20:00:00 +0100
 img: meetup
-title: Attemp meetups
+title: Attend meetups
 excerpt: Benefits of attending development meetups.
 ---
 
@@ -50,5 +50,5 @@ You might even have a little by accident.
 
 </blockquote>
 
-<img src="http://webdevandstuff.com/wp-content/uploads/2016/09/alfred-compressor-1024x433.jpg" alt="alfred giving advice" />
+<img src="../images/alfred.jpg" alt="alfred giving advice" />
 

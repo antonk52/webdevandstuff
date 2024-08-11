@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as cp from 'child_process';
 import * as path from 'path';
 import matter from 'gray-matter';
 import {marked} from 'marked';
@@ -10,11 +11,13 @@ const DIST_WIKI = path.resolve(__dirname, '../dist/wiki');
 
 const SRC_POSTS = path.resolve(__dirname, '../posts');
 const SRC_WIKI = path.resolve(__dirname, '../wiki');
+const SRC_IMAGES = path.resolve(__dirname, '../images');
 
 type PostMeta = {
     title?: string;
     date?: string;
     excerpt?: string;
+    kind?: 'home' | string;
 }
 
 type ItemEntry = {
@@ -107,10 +110,14 @@ type ItemEntry = {
                 {
                     title: "Web dev and stuff",
                     excerpt: "A collection of posts and wiki entries about web development and other stuff.",
+                    kind: 'home',
                 },
             ),
         );
     }
+
+    console.log('> copying images');
+    cp.execSync(`cp -a ${SRC_IMAGES} ${DIST_FOLDER}`);
 
     console.log('> done');
 })()
@@ -149,6 +156,7 @@ function surroundWithHtml(content: string, data: PostMeta) {
 <body>
     <article class="markdown-body">
         <h1>${data.title ?? "no-title"}</h1>
+        ${data.kind === 'home' ? `<p>${data.excerpt ?? 'no exerpt'}</p>` : ''}
         ${content}
     </article>
 </body>
