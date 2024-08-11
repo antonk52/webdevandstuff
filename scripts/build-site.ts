@@ -74,7 +74,7 @@ const SRC_WIKI = path.resolve(__dirname, '../wiki');
         })
     }
 
-    // Create home page index.html
+    console.log('> creating home page index.html');
     {
         await fs.promises.writeFile(
             path.resolve(DIST_FOLDER, 'index.html'),
