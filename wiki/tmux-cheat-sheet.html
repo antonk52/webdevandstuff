@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Personal tmux cheat sheet</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.6.1/github-markdown.min.css">
+    <style>
+        body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0d1117;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <article class="markdown-body">
+        <h1>Personal tmux cheat sheet</h1>
+        <p>The default tmux <code>prefix</code> is <kbd>ctrl</kbd><kbd>b</kbd>. You can remap it to anything you prefer. For simplicity sake later on it will be referred as <kbd>prefix</kbd></p>
+<h2>Common</h2>
+<ul>
+<li><kbd>prefix</kbd> + <kbd>t</kbd> - display time in current pane</li>
+<li><kbd>prefix</kbd> + <kbd>d</kbd> - detach from session</li>
+<li><kbd>prefix</kbd> + <kbd>?</kbd> - list shortcuts</li>
+<li><kbd>prefix</kbd> + <kbd>:</kbd> - enter command mode</li>
+<li><kbd>prefix</kbd> + <kbd>[</kbd> - enter copy mode</li>
+<li><kbd>prefix</kbd> + <kbd>]</kbd> - paste last copied</li>
+<li><kbd>prefix</kbd> + <kbd>=</kbd> - choose a paste buffers from already copied</li>
+</ul>
+<h2>Panes (splits)</h2>
+<ul>
+<li><kbd>prefix</kbd> + <kbd>q</kbd> - display name numbers</li>
+<li><kbd>prefix</kbd> + <kbd>x</kbd> - kill pane</li>
+<li><kbd>prefix</kbd> + <kbd>space</kbd> - toggle between pane layouts</li>
+<li><kbd>prefix</kbd> + <kbd>alt</kbd><kbd>1-5</kbd> - use layout preset 1-5</li>
+<li><kbd>prefix</kbd> + <kbd>z</kbd> - toggle pane to/from full screen mode</li>
+<li><kbd>prefix</kbd> + <kbd>!</kbd> - break pane into its own window</li>
+</ul>
+<h2>Windows (tabs)</h2>
+<ul>
+<li><kbd>prefix</kbd> + <kbd>,</kbd> - rename window</li>
+<li><kbd>prefix</kbd> + <kbd>c</kbd> - create window</li>
+<li><kbd>prefix</kbd> + <kbd>&</kbd> - kill window</li>
+</ul>
+<h2>Awkward defaults</h2>
+<ul>
+<li><kbd>prefix</kbd> + <kbd>%</kbd> - vertical split</li>
+<li><kbd>prefix</kbd> + <kbd>"</kbd> - horizontal split</li>
+</ul>
+
+    </article>
+</body>
+</html>
