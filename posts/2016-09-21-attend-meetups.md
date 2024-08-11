@@ -3,6 +3,7 @@ layout: post
 categories: thoughts
 date: 2016-09-21 20:00:00 +0100
 img: meetup
+title: Attemp meetups
 excerpt: Benefits of attending development meetups.
 ---
 

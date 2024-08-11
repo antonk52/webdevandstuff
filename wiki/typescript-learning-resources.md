@@ -1,8 +1,7 @@
 ---
 tags: [typescript]
+title: Typescript - learning resources
 ---
-
-# Typescript - learning resources
 
 This is meant as a brief overview of learning resources for teams who are adopting typescript.
 

@@ -1,8 +1,7 @@
 ---
 tags: [tmux]
+title: Personal tmux cheat sheet
 ---
-
-# Personal tmux cheat sheet
 
 The default tmux `prefix` is <kbd>ctrl</kbd><kbd>b</kbd>. You can remap it to anything you prefer. For simplicity sake later on it will be referred as <kbd>prefix</kbd>
 

@@ -1,8 +1,7 @@
 ---
 tags: [vim, performance, dx]
+title: Vim startup performance
 ---
-
-# Vim startup performance
 
 Vim already has two built in tools to help figure out what is going on.
 

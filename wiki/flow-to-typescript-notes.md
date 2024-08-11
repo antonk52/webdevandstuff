@@ -1,8 +1,7 @@
 ---
 tags: [flow, typescript]
+title: Flow to typescript migration notes
 ---
-
-# Flow to typescript migration notes
 
 Core difference to note when switching from flow type system to typescript. I've been mainly using flow v0.83, if you used newer versions your experience may vary.
 

@@ -1,8 +1,7 @@
 ---
 tags: [typescript]
+title: Typescript assertions
 ---
-
-# Typescript assertions
 
 The below implies that you have already read the [type assertions](https://www.typescriptlang.org/docs/handbook/basic-types.html#type-assertions) section in typescript documentation.
 

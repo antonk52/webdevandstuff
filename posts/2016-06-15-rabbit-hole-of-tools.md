@@ -2,6 +2,7 @@
 layout: post
 categories: thoughts
 img: tools
+title: Rabbit home of tools
 excerpt: Frameworks, CMS, build systems, text editors, OS', sounds familiar?
 ---
 

@@ -1,8 +1,7 @@
 ---
 tags: [mentoring]
+title: Guide for mentoring
 ---
-
-# Guide for mentoring
 
 A few tips I learned along the way for mentoring developers.
 

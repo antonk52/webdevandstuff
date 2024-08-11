@@ -1,8 +1,7 @@
 ---
 tags: [touch-typing]
+title: Resources for touch typing practice
 ---
-
-# Resources for touch typing practice
 
 - https://www.typing.com
 - https://10fastfingers.com

@@ -1,8 +1,7 @@
 ---
 tags: [twitch]
+title: Twitch related stuff
 ---
-
-# Twitch related stuff
 
 ## Prestream checklist
 
