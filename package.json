@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "ts-node ./scripts/build-site.ts",
+    "dev-server": "ts-node ./scripts/build-site.ts --dev && serve ./dist",
     "generate-content-by-tags": "ts-node ./build.ts"
   },
   "author": "antonk52",

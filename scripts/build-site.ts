@@ -28,6 +28,8 @@ type ItemEntry = {
 }
 
 (async function main() {
+    const IS_DEV = process.argv.includes('--dev');
+
     console.log('> creating dist folder');
     if (fs.existsSync(DIST_FOLDER)) {
         await fs.promises.mkdir(DIST_FOLDER, { recursive: true });
@@ -96,11 +98,11 @@ type ItemEntry = {
         const content = [
             '<h2>Posts</h2>',
             '<ul>',
-            ...postEntries.map(printListEntry),
+            ...printEntrys(postEntries, IS_DEV),
             '</ul>',
             '<h2>Wiki</h2>',
             '<ul>',
-            ...wikiEntries.map(printListEntry),
+            ...printEntrys(wikiEntries, IS_DEV),
             '</ul>',
         ].join('');
         await fs.promises.writeFile(
@@ -122,8 +124,9 @@ type ItemEntry = {
     console.log('> done');
 })()
 
-function printListEntry(entry: ItemEntry) {
-    return `<li><a href="/webdevandstuff${entry.href}">${entry.title}</a></li>`;
+function printEntrys(entries: ItemEntry[], isDev: boolean) {
+    return entries
+        .map(entry => `<li><a href="${isDev ? '' : '/webdevandstuff'}${entry.href}">${entry.title}</a></li>`);
 }
 
 function surroundWithHtml(content: string, data: PostMeta) {
