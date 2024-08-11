@@ -12,9 +12,10 @@ const SRC_POSTS = path.resolve(__dirname, '../posts');
 const SRC_WIKI = path.resolve(__dirname, '../wiki');
 
 (async function main() {
-    // clear the dist folder
-    console.log('> clearing dist folder');
-    await fs.promises.rmdir(DIST_FOLDER, { recursive: true });
+    console.log('> creating dist folder');
+    if (fs.existsSync(DIST_FOLDER)) {
+        await fs.promises.mkdir(DIST_FOLDER, { recursive: true });
+    }
 
     console.log('> creating dist folder');
     await fs.promises.mkdir(DIST_POSTS, { recursive: true });
