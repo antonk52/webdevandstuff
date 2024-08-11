@@ -154,7 +154,12 @@ function surroundWithHtml(content: string, data: PostMeta) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.6.1/github-markdown.min.css">
     <style>
         body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
             box-sizing: border-box;
+            margin: 0;
+        }
+
+        .markdown-body {
             min-width: 200px;
             max-width: 800px;
             margin: 0 auto;
@@ -166,15 +171,28 @@ function surroundWithHtml(content: string, data: PostMeta) {
                 background-color: #0d1117;
             }
         }
+
+        header {
+            display: flex;
+            gap: 24px;
+            border-bottom: 1px solid #e1e4e8;
+            padding: 16px 24px;
+        }
     </style>
 </head>
 
 <body>
-    <article class="markdown-body">
+    <header>
+        <a href="/webdevandstuff">Web dev and stuff</a>
+        <a href="https://github.com/antonk52" target="_blank">GitHub</a>
+        <a href="https://twitter.com/antonk52" target="_blank">Twitter</a>
+    </header>
+
+    <${data.kind === 'home' ? 'main' : 'article'} class="markdown-body">
         <h1>${data.title ?? "no-title"}</h1>
         ${data.kind === 'home' ? `<p>${data.excerpt ?? 'no exerpt'}</p>` : ''}
         ${content}
-    </article>
+    </${data.kind === 'home' ? 'main' : 'article'}>
 </body>
 </html>
 `);
