@@ -214,6 +214,16 @@ function surroundWithHtml(content: string, data: PostMeta) {
                 background-color: #0d1117;
             }
         }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --fgColor-default: #e6edf3;
+            }
+        }
+        @media (prefers-color-scheme: light) {
+            :root {
+                --fgColor-default: #1f2328;
+            }
+        }
 
         header {
             display: flex;
@@ -221,13 +231,16 @@ function surroundWithHtml(content: string, data: PostMeta) {
             border-bottom: 1px solid #e1e4e8;
             padding: 16px 24px;
         }
+        header a {
+            color: var(--fgColor-default);
+        }
         .markdown-body h1 > a,
         .markdown-body h2 > a,
         .markdown-body h3 > a,
         .markdown-body h4 > a,
         .markdown-body h5 > a,
         .markdown-body h6 > a {
-            color: color: var(--fgColor-default);
+            color: var(--fgColor-default);
             text-decoration: none;
         }
     </style>
