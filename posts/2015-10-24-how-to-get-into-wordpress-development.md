@@ -9,7 +9,7 @@ excerpt: My personal wordpress challenge. How & Why?
 
 At the time I was already working in web development industry. Yet, my prefered CMS of choice was <a href="https://www.drupal.org/">Drupal</a>. I was freelancing by making drupal sites for my clients while being a part time web master at a Magento store. After I saw the demand of work for wordpress sites I thought that it would be a good skill to have so I dived in.
 
-## Personal wordpress challenge
+## Personal wordpress challenge
 
 I knew that the most reliable way to learn something is to actually do it. By following this logic I set myself a goal to make a wordpress site each week for the next 6 weeks. Regardless of the result each week, I would note of the things I did right and fairly quickly and things that took too long to do or didn't get finished at all. These notes helped me to approach the development of next site for the following week and so on.
 

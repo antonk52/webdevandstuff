@@ -2,8 +2,14 @@ import * as fs from 'fs';
 import * as cp from 'child_process';
 import * as path from 'path';
 import matter from 'gray-matter';
-import {marked} from 'marked';
+import {marked, MarkedOptions, Token} from 'marked';
+import {gfmHeadingId} from 'marked-gfm-heading-id';
+import {slug} from 'github-slugger';
 import assert from 'assert';
+import {fileURLToPath} from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename)
 
 const DIST_FOLDER = path.resolve(__dirname, '../dist');
 const DIST_POSTS = path.resolve(__dirname, '../dist/post');
@@ -28,6 +34,43 @@ type ItemEntry = {
     html: string;
 }
 
+// replace the heading content with a link to the heading id
+const markedOpts: MarkedOptions = {
+    hooks: {
+        options: {},
+        preprocess: x => x,
+        postprocess: x => x,
+        processAllTokens(tokens) {
+            return tokens.map(t => {
+                switch (t.type) {
+                    case 'heading':
+                        if (t.tokens?.length == 1 && t.tokens[0].type === 'text') {
+                            const textToken = t.tokens[0];
+                            const id = slug(t.text);
+                            const newTokens: Token[] = [{
+                                type: 'link',
+                                raw: `<a href="#${id}">${t.text}</a>`,
+                                href: `#${id}`,
+                                text: t.text,
+                                tokens: [textToken],
+                            }];
+
+                            return {
+                                ...t,
+                                tokens: newTokens,
+                            }
+                        }
+                        return t;
+                    default:
+                        return t
+                }
+            });
+        }
+    }
+}
+// add heading id to the heading itself
+marked.use(gfmHeadingId({}));
+
 (async function main() {
     const IS_DEV = process.argv.includes('--dev');
 
@@ -50,7 +93,7 @@ type ItemEntry = {
         const postContent = await fs.promises.readFile(path.resolve(SRC_POSTS, post), 'utf-8');
 
         const parsed = matter(postContent);
-        const html = await marked(parsed.content);
+        const html = await marked(parsed.content, markedOpts);
 
         assert.ok(parsed.data.title, `Post "${post}" is missing "title" fornt matter`);
         assert.ok(parsed.data.excerpt, `Post "${post}" is missing "exerpt" fornt matter`);
@@ -82,7 +125,7 @@ type ItemEntry = {
         const wikiContent = await fs.promises.readFile(path.resolve(SRC_WIKI, wiki), 'utf-8');
 
         const parsed = matter(wikiContent);
-        const html = await marked(parsed.content);
+        const html = await marked(parsed.content, markedOpts);
 
         assert.ok(parsed.data.title, `Wiki "${wiki}" is missing "title" front matter`);
         // assert.ok(parsed.data.excerpt, `Wiki "${wiki}" is missing "exerpt" front matter`);
@@ -177,6 +220,15 @@ function surroundWithHtml(content: string, data: PostMeta) {
             gap: 24px;
             border-bottom: 1px solid #e1e4e8;
             padding: 16px 24px;
+        }
+        .markdown-body h1 > a,
+        .markdown-body h2 > a,
+        .markdown-body h3 > a,
+        .markdown-body h4 > a,
+        .markdown-body h5 > a,
+        .markdown-body h6 > a {
+            color: color: var(--fgColor-default);
+            text-decoration: none;
         }
     </style>
 </head>

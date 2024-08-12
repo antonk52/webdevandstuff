@@ -1,12 +1,13 @@
 {
   "name": "webdevandstuff",
+  "type": "module",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "ts-node ./scripts/build-site.ts",
-    "dev-server": "ts-node ./scripts/build-site.ts --dev && serve ./dist",
-    "generate-content-by-tags": "ts-node ./build.ts"
+    "build": "tsx ./scripts/build-site.ts",
+    "dev-server": "tsx ./scripts/build-site.ts --dev && serve ./dist",
+    "generate-content-by-tags": "tsx ./build.ts"
   },
   "author": "antonk52",
   "license": "MIT",
@@ -14,11 +15,12 @@
     "@types/node": "^14.11.2",
     "front-matter": "^4.0.2",
     "husky": "^6.0.0",
-    "ts-node": "^9.0.0",
     "typescript": "^4.0.3"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
-    "marked": "^14.0.0"
+    "marked": "^14.0.0",
+    "marked-gfm-heading-id": "^4.0.1",
+    "tsx": "^4.17.0"
   }
 }
