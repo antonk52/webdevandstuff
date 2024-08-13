@@ -25,12 +25,34 @@
                 background-color: #0d1117;
             }
         }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --fgColor-default: #e6edf3;
+            }
+        }
+        @media (prefers-color-scheme: light) {
+            :root {
+                --fgColor-default: #1f2328;
+            }
+        }
 
         header {
             display: flex;
             gap: 24px;
             border-bottom: 1px solid #e1e4e8;
             padding: 16px 24px;
+        }
+        header a {
+            color: var(--fgColor-default);
+        }
+        .markdown-body h1 > a,
+        .markdown-body h2 > a,
+        .markdown-body h3 > a,
+        .markdown-body h4 > a,
+        .markdown-body h5 > a,
+        .markdown-body h6 > a {
+            color: var(--fgColor-default);
+            text-decoration: none;
         }
     </style>
 </head>
@@ -45,10 +67,10 @@
     <article class="markdown-body">
         <h1>WP-CLI with MAMP on OS X</h1>
         
-        <h2>wp-cli</h2>
+        <h2 id="wp-cli"><a href="#wp-cli">wp-cli</a></h2>
 <p>You heard of WP-CLI and decided that it can really help you to speed up your development process, but once you install it on your mac and start performing cli tricks you keep bumping into <code>Error establishing a database connection</code></p>
 <p>The reason this happens is wp-cli is not making good friends with MAMP out of the box. Fortunately this is easy to fix. To do so cd into your home directory and add the following to your <code>.bashrc</code> file. If the file does not exists feel free to create one.</p>
-<h2>This goes in .bashrc file</h2>
+<h2 id="this-goes-in-bashrc-file"><a href="#this-goes-in-bashrc-file">This goes in .bashrc file</a></h2>
 <pre># FIX PHP MAMP for WP-CLI
 export PATH=/Applications/MAMP/bin/php/php5.6.10/bin:$PATH
 export PATH=$PATH:/Applications/MAMP/Library/bin/</pre>

@@ -25,12 +25,34 @@
                 background-color: #0d1117;
             }
         }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --fgColor-default: #e6edf3;
+            }
+        }
+        @media (prefers-color-scheme: light) {
+            :root {
+                --fgColor-default: #1f2328;
+            }
+        }
 
         header {
             display: flex;
             gap: 24px;
             border-bottom: 1px solid #e1e4e8;
             padding: 16px 24px;
+        }
+        header a {
+            color: var(--fgColor-default);
+        }
+        .markdown-body h1 > a,
+        .markdown-body h2 > a,
+        .markdown-body h3 > a,
+        .markdown-body h4 > a,
+        .markdown-body h5 > a,
+        .markdown-body h6 > a {
+            color: var(--fgColor-default);
+            text-decoration: none;
         }
     </style>
 </head>
@@ -46,14 +68,14 @@
         <h1>Typescript assertions</h1>
         
         <p>The below implies that you have already read the <a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#type-assertions">type assertions</a> section in typescript documentation.</p>
-<h2>List of content</h2>
+<h2 id="list-of-content"><a href="#list-of-content">List of content</a></h2>
 <ul>
 <li><a href="#as-cast-operator"><code>as</code> cast operator</a></li>
 <li><a href="#const-assertions">Const assertions</a></li>
 <li><a href="#assert-functions">Assert functions</a></li>
 <li><a href="#key-remapping-in-mapped-types">Key remapping in mapped types</a></li>
 </ul>
-<h2><code>as</code> cast operator</h2>
+<h2 id="as-cast-operator"><code>as</code> cast operator</h2>
 <p>Added in <a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-1-6.html#new-tsx-file-extension-and-as-operator">v1.6</a></p>
 <p>This operator allows you to explicitly cast the type for a value of a different type without typescript raising an error. This is a dangerous a foot gun like feature that should be used with care and consciously. To quote the typescript docs this is a way to tell the compiler <code>trust me, I know what I’m doing.</code></p>
 <p>This feature has two ways to use it.</p>
@@ -68,7 +90,7 @@ const b = &lt;Foo&gt;notFoo;
  * now both `a` and `b` are of type `Foo`
  */
 </code></pre>
-<h2>Const assertions</h2>
+<h2 id="const-assertions-1"><a href="#const-assertions">Const assertions</a></h2>
 <p><code>const foo = {} as const</code></p>
 <p>Added in <a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-4.html#const-assertions">v3.4</a></p>
 <p>This feature allows you to disable type widening when declaring values in typescript.</p>
@@ -105,7 +127,7 @@ frozen.c.d = &#39;foo&#39;
 <li>object literals get <code>readonly</code> properties</li>
 <li>array literals become <code>readonly</code> tuples</li>
 </ul>
-<h2>Assert functions</h2>
+<h2 id="assert-functions-1"><a href="#assert-functions">Assert functions</a></h2>
 <p>Added in <a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions">v3.7</a></p>
 <p>Assert functions are similar to <code>type guards</code> with the only difference that the function throws instead of returning a falsy value. This works on par with nodejs <a href="https://nodejs.org/docs/latest/api/assert.html"><code>assert</code></a> module.</p>
 <p>Using assert function you can validate an input ie</p>
@@ -138,7 +160,7 @@ function bar(input: string | null) {
     input; // string
 }
 </code></pre>
-<h2>Key remapping in mapped types</h2>
+<h2 id="key-remapping-in-mapped-types"><a href="#key-remapping-in-mapped-types">Key remapping in mapped types</a></h2>
 <p>ie <code>{[K in keyof T as Foo]: T[K]}</code></p>
 <p>Added in <a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-1.html#key-remapping-in-mapped-types">v4.1</a></p>
 <p>Reminder of mapped type syntax in typescript</p>

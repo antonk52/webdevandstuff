@@ -25,12 +25,34 @@
                 background-color: #0d1117;
             }
         }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --fgColor-default: #e6edf3;
+            }
+        }
+        @media (prefers-color-scheme: light) {
+            :root {
+                --fgColor-default: #1f2328;
+            }
+        }
 
         header {
             display: flex;
             gap: 24px;
             border-bottom: 1px solid #e1e4e8;
             padding: 16px 24px;
+        }
+        header a {
+            color: var(--fgColor-default);
+        }
+        .markdown-body h1 > a,
+        .markdown-body h2 > a,
+        .markdown-body h3 > a,
+        .markdown-body h4 > a,
+        .markdown-body h5 > a,
+        .markdown-body h6 > a {
+            color: var(--fgColor-default);
+            text-decoration: none;
         }
     </style>
 </head>
@@ -46,7 +68,7 @@
         <h1>Personal tmux cheat sheet</h1>
         
         <p>The default tmux <code>prefix</code> is <kbd>ctrl</kbd><kbd>b</kbd>. You can remap it to anything you prefer. For simplicity sake later on it will be referred as <kbd>prefix</kbd></p>
-<h2>Common</h2>
+<h2 id="common"><a href="#common">Common</a></h2>
 <ul>
 <li><kbd>prefix</kbd> + <kbd>t</kbd> - display time in current pane</li>
 <li><kbd>prefix</kbd> + <kbd>d</kbd> - detach from session</li>
@@ -56,7 +78,7 @@
 <li><kbd>prefix</kbd> + <kbd>]</kbd> - paste last copied</li>
 <li><kbd>prefix</kbd> + <kbd>=</kbd> - choose a paste buffers from already copied</li>
 </ul>
-<h2>Panes (splits)</h2>
+<h2 id="panes-splits"><a href="#panes-splits">Panes (splits)</a></h2>
 <ul>
 <li><kbd>prefix</kbd> + <kbd>q</kbd> - display name numbers</li>
 <li><kbd>prefix</kbd> + <kbd>x</kbd> - kill pane</li>
@@ -65,13 +87,13 @@
 <li><kbd>prefix</kbd> + <kbd>z</kbd> - toggle pane to/from full screen mode</li>
 <li><kbd>prefix</kbd> + <kbd>!</kbd> - break pane into its own window</li>
 </ul>
-<h2>Windows (tabs)</h2>
+<h2 id="windows-tabs"><a href="#windows-tabs">Windows (tabs)</a></h2>
 <ul>
 <li><kbd>prefix</kbd> + <kbd>,</kbd> - rename window</li>
 <li><kbd>prefix</kbd> + <kbd>c</kbd> - create window</li>
 <li><kbd>prefix</kbd> + <kbd>&</kbd> - kill window</li>
 </ul>
-<h2>Awkward defaults</h2>
+<h2 id="awkward-defaults"><a href="#awkward-defaults">Awkward defaults</a></h2>
 <ul>
 <li><kbd>prefix</kbd> + <kbd>%</kbd> - vertical split</li>
 <li><kbd>prefix</kbd> + <kbd>"</kbd> - horizontal split</li>
