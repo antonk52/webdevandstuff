@@ -27,7 +27,7 @@ jobs:
       - run: npm ci
 
       - name: Build
-        run: npx ts-node ./scripts/build-site.ts
+        run: npm run build
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
