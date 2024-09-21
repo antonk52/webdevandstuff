@@ -72,8 +72,6 @@ const markedOpts: MarkedOptions = {
 marked.use(gfmHeadingId({}));
 
 (async function main() {
-    const IS_DEV = process.argv.includes('--dev');
-
     console.log('> creating dist folder');
     if (fs.existsSync(DIST_FOLDER)) {
         await fs.promises.mkdir(DIST_FOLDER, { recursive: true });
@@ -153,11 +151,11 @@ marked.use(gfmHeadingId({}));
         const content = [
             '<h2>Posts</h2>',
             '<ul>',
-            ...printEntrys(postEntries, IS_DEV),
+            ...printEntrys(postEntries),
             '</ul>',
             '<h2>Wiki</h2>',
             '<ul>',
-            ...printEntrys(wikiEntries, IS_DEV),
+            ...printEntrys(wikiEntries),
             '</ul>',
         ].join('');
         await fs.promises.writeFile(
@@ -179,10 +177,10 @@ marked.use(gfmHeadingId({}));
     console.log('> done');
 })()
 
-function printEntrys(entries: ItemEntry[], isDev: boolean) {
+function printEntrys(entries: ItemEntry[]) {
     return entries
         .sort((a, b) => a.date < b.date ? 1 : -1)
-        .map(entry => `<li><a href="${isDev ? '' : '/webdevandstuff'}${entry.href}">${entry.title}</a>${entry.date ? ` - ${entry.date}` : ''}</li>`);
+        .map(entry => `<li><a href="${entry.href}">${entry.title}</a>${entry.date ? ` - ${entry.date}` : ''}</li>`);
 }
 
 function surroundWithHtml(content: string, data: PostMeta) {
