@@ -180,7 +180,7 @@ marked.use(gfmHeadingId({}));
 function printEntrys(entries: ItemEntry[]) {
     return entries
         .sort((a, b) => a.date < b.date ? 1 : -1)
-        .map(entry => `<li><a href="${entry.href}">${entry.title}</a>${entry.date ? ` - ${entry.date}` : ''}</li>`);
+        .map(entry => `<li><a href=".${entry.href}">${entry.title}</a>${entry.date ? ` - ${entry.date}` : ''}</li>`);
 }
 
 function surroundWithHtml(content: string, data: PostMeta) {
