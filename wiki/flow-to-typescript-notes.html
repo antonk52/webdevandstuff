@@ -55,6 +55,10 @@
             text-decoration: none;
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
 </head>
 
 <body>
@@ -557,7 +561,7 @@ frozen.c.d = &#39;foo&#39;
 <p>Added in <a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions">v3.7</a></p>
 <p>Assert functions are similar to <code>type guards</code> with the only difference that the function throws instead of returning a falsy value. This works on par with nodejs <a href="https://nodejs.org/docs/latest/api/assert.html"><code>assert</code></a> module.</p>
 <p>Using assert function you can validate an input ie</p>
-<pre><code class="language-ts">// typescript
+<pre><code class="language-typescript">// typescript
 
 function plainAssertion(arg: unknown): asserts arg {
     if (!arg) {
@@ -576,7 +580,7 @@ function foo(input: boolean, item: string | null) {
 }
 </code></pre>
 <p>Alternatively you can narrow down the type to be more specific. This is when the similarity with <code>type guards</code> shows.</p>
-<pre><code class="language-ts">// typescript
+<pre><code class="language-typescript">// typescript
 
 type Item = {
     type: &#39;item&#39;;
