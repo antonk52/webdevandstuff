@@ -34,8 +34,11 @@ type ItemEntry = {
     html: string;
 }
 
+// filepaths of posts that use codebloks with languages
+const prismJsSet = new Set<string>();
+
 // replace the heading content with a link to the heading id
-const markedOpts: MarkedOptions = {
+const getMarkedOpts = (filepath: string): MarkedOptions => ({
     hooks: {
         options: {},
         preprocess: x => x,
@@ -43,6 +46,12 @@ const markedOpts: MarkedOptions = {
         processAllTokens(tokens) {
             return tokens.map(t => {
                 switch (t.type) {
+                    case 'code':
+                        if (t.lang === 'ts') {
+                            t.lang = 'typescript';
+                        }
+                        if (t.lang && ['javascript', 'typescript'].includes(t.lang)) prismJsSet.add(filepath)
+                        return t;
                     case 'heading':
                         if (t.tokens?.length == 1 && t.tokens[0].type === 'text') {
                             const textToken = t.tokens[0];
@@ -67,7 +76,7 @@ const markedOpts: MarkedOptions = {
             });
         }
     }
-}
+});
 // add heading id to the heading itself
 marked.use(gfmHeadingId({}));
 
@@ -88,10 +97,11 @@ marked.use(gfmHeadingId({}));
     console.log('> creating posts');
     const postEntries: ItemEntry[] = [];
     for (const post of posts) {
-        const postContent = await fs.promises.readFile(path.resolve(SRC_POSTS, post), 'utf-8');
+        const filepath = path.resolve(SRC_POSTS, post);
+        const postContent = await fs.promises.readFile(filepath, 'utf-8');
 
         const parsed = matter(postContent);
-        const html = await marked(parsed.content, markedOpts);
+        const html = await marked(parsed.content, getMarkedOpts(filepath));
 
         assert.ok(parsed.data.title, `Post "${post}" is missing "title" fornt matter`);
         assert.ok(parsed.data.excerpt, `Post "${post}" is missing "exerpt" fornt matter`);
@@ -103,7 +113,7 @@ marked.use(gfmHeadingId({}));
 
         await fs.promises.writeFile(
             path.resolve(DIST_POSTS, post.replace('.md', '.html')),
-            surroundWithHtml(html, parsed.data),
+            surroundWithHtml(html, parsed.data, filepath),
         );
         postEntries.push({
             href: `/post/${post.replace('.md', '.html')}`,
@@ -120,17 +130,18 @@ marked.use(gfmHeadingId({}));
 
     const wikiEntries: ItemEntry[] = [];
     for (const wiki of wikis) {
-        const wikiContent = await fs.promises.readFile(path.resolve(SRC_WIKI, wiki), 'utf-8');
+        const filepath = path.resolve(SRC_WIKI, wiki);
+        const wikiContent = await fs.promises.readFile(filepath, 'utf-8');
 
         const parsed = matter(wikiContent);
-        const html = await marked(parsed.content, markedOpts);
+        const html = await marked(parsed.content, getMarkedOpts(filepath));
 
         assert.ok(parsed.data.title, `Wiki "${wiki}" is missing "title" front matter`);
         // assert.ok(parsed.data.excerpt, `Wiki "${wiki}" is missing "exerpt" front matter`);
 
         await fs.promises.writeFile(
             path.resolve(DIST_WIKI, wiki.replace('.md', '.html')),
-            surroundWithHtml(html, parsed.data),
+            surroundWithHtml(html, parsed.data, filepath),
         );
 
         const date = cp.execSync(
@@ -167,6 +178,7 @@ marked.use(gfmHeadingId({}));
                     excerpt: "A collection of posts and wiki entries about web development and other stuff.",
                     kind: 'home',
                 },
+                'index.html',
             ),
         );
     }
@@ -183,7 +195,14 @@ function printEntrys(entries: ItemEntry[]) {
         .map(entry => `<li><a href=".${entry.href}">${entry.title}</a>${entry.date ? ` - ${entry.date}` : ''}</li>`);
 }
 
-function surroundWithHtml(content: string, data: PostMeta) {
+const primsJsAssets = `
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+`.trim();
+
+function surroundWithHtml(content: string, data: PostMeta, filepath: string) {
     return (
 `<!DOCTYPE html>
 <html lang="en">
@@ -242,6 +261,7 @@ function surroundWithHtml(content: string, data: PostMeta) {
             text-decoration: none;
         }
     </style>
+    ${prismJsSet.has(filepath) ? primsJsAssets : ''}
 </head>
 
 <body>
