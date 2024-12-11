@@ -4,6 +4,7 @@ import * as path from 'path';
 import matter from 'gray-matter';
 import {marked, MarkedOptions, Token} from 'marked';
 import {gfmHeadingId} from 'marked-gfm-heading-id';
+import Prism from 'prismjs';
 import {slug} from 'github-slugger';
 import assert from 'assert';
 import {fileURLToPath} from 'url';
@@ -79,6 +80,17 @@ const getMarkedOpts = (filepath: string): MarkedOptions => ({
 });
 // add heading id to the heading itself
 marked.use(gfmHeadingId({}));
+
+const renderer = new marked.Renderer();
+
+renderer.code = ({text, lang}) => {
+    const grammar = Prism.languages[lang ?? ''] || Prism.languages.markup; // Fallback to markup if language not found
+    const highlighted = (lang && ['ts','tsx', 'typescript', 'javascript'].includes(lang)) ? Prism.highlight(text, grammar, lang) : text;
+    return `<pre class="language-${lang}"><code class="language-${lang}">${highlighted}</code></pre>\n`;
+};
+
+marked.setOptions({ renderer });
+
 
 (async function main() {
     console.log('> creating dist folder');
@@ -195,12 +207,7 @@ function printEntrys(entries: ItemEntry[]) {
         .map(entry => `<li><a href=".${entry.href}">${entry.title}</a>${entry.date ? ` - ${entry.date}` : ''}</li>`);
 }
 
-const primsJsAssets = `
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
-`.trim();
+const primsJsAssets = `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">`;
 
 function surroundWithHtml(content: string, data: PostMeta, filepath: string) {
     return (
