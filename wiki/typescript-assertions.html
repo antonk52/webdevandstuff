@@ -56,9 +56,6 @@
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
 </head>
 
 <body>
@@ -72,72 +69,69 @@
         <h1>Typescript assertions</h1>
         
         <p>The below implies that you have already read the <a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#type-assertions">type assertions</a> section in typescript documentation.</p>
-<h2 id="list-of-content"><a href="#list-of-content">List of content</a></h2>
+<h2><a href="#list-of-content">List of content</a></h2>
 <ul>
 <li><a href="#as-cast-operator"><code>as</code> cast operator</a></li>
 <li><a href="#const-assertions">Const assertions</a></li>
 <li><a href="#assert-functions">Assert functions</a></li>
 <li><a href="#key-remapping-in-mapped-types">Key remapping in mapped types</a></li>
 </ul>
-<h2 id="as-cast-operator"><code>as</code> cast operator</h2>
+<h2><code>as</code> cast operator</h2>
 <p>Added in <a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-1-6.html#new-tsx-file-extension-and-as-operator">v1.6</a></p>
 <p>This operator allows you to explicitly cast the type for a value of a different type without typescript raising an error. This is a dangerous a foot gun like feature that should be used with care and consciously. To quote the typescript docs this is a way to tell the compiler <code>trust me, I know what I’m doing.</code></p>
 <p>This feature has two ways to use it.</p>
-<pre><code class="language-typescript">const a = notFoo as Foo;
+<pre class="language-typescript"><code class="language-typescript">const a = notFoo as Foo;
 /**
  * The same thing
  * but wont work for `.tsx` files
  */
-const b = &lt;Foo&gt;notFoo;
+const b = <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>Foo</span><span class="token punctuation">></span></span>notFoo;
 
 /**
  * now both `a` and `b` are of type `Foo`
- */
-</code></pre>
-<h2 id="const-assertions-1"><a href="#const-assertions">Const assertions</a></h2>
+ */</code></pre>
+<h2><a href="#const-assertions">Const assertions</a></h2>
 <p><code>const foo = {} as const</code></p>
 <p>Added in <a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-4.html#const-assertions">v3.4</a></p>
 <p>This feature allows you to disable type widening when declaring values in typescript.</p>
-<pre><code class="language-typescript">const plainObj = {a: 1, b: &#39;foo&#39;};
+<pre class="language-typescript"><code class="language-typescript">const plainObj = {a: 1, b: 'foo'};
 
 plainObj; // {a: number; b: string}
 
-const constObj = {a: 1, b: &#39;foo&#39;} as const;
-const constObjAlt = &lt;const&gt;{a: 1, b: &#39;foo&#39;};
+const constObj = {a: 1, b: 'foo'} as const;
+const constObjAlt = <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>const</span><span class="token punctuation">></span></span>{a: 1, b: 'foo'};
 
-constObj; // {readonly a: 1; readonly b: &#39;foo&#39;}
-</code></pre>
+constObj; // {readonly a: 1; readonly b: 'foo'}</code></pre>
 <p>This is <strong>not</strong> the same as using <code>Object.freeze</code></p>
-<pre><code class="language-typescript">const constObj = {a: 1, b: &#39;foo&#39;, c: {d: &#39;bar&#39;}} as const;
+<pre class="language-typescript"><code class="language-typescript">const constObj = {a: 1, b: 'foo', c: {d: 'bar'}} as const;
 
-constObj; // {readonly a: 1, readonly b: &#39;foo&#39;, readonly c: {readonly d: &#39;bar}}
+constObj; // {readonly a: 1, readonly b: 'foo', readonly c: {readonly d: 'bar}}
 
-// @ts-expect-error Cannot assign to &#39;d&#39; because it is a read-only property.
-constObj.c.d = &#39;foo&#39;
+// @ts-expect-error Cannot assign to 'd' because it is a read-only property.
+constObj.c.d = 'foo'
 
-const frozen = Object.freeze({a: 1, b: &#39;foo&#39;, c: {d: &#39;bar&#39;}})
+const frozen = Object.freeze({a: 1, b: 'foo', c: {d: 'bar'}})
 
-frozen; // Readonly&lt;{a: number; b: string; c: {d: string}}&gt;
+frozen; // Readonly<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">{a:</span></span> <span class="token attr-name">number;</span> <span class="token attr-name"><span class="token namespace">b:</span></span> <span class="token attr-name">string;</span> <span class="token attr-name"><span class="token namespace">c:</span></span> <span class="token attr-name"><span class="token namespace">{d:</span></span> <span class="token attr-name">string}}</span><span class="token punctuation">></span></span>
 
-// @ts-expect-error Cannot assign to &#39;b&#39; because it is a read-only property.
-frozen.b = &#39;foo 2&#39;
+// @ts-expect-error Cannot assign to 'b' because it is a read-only property.
+frozen.b = 'foo 2'
 
 // no error since `Readonly` is not deep
-frozen.c.d = &#39;foo&#39;
-</code></pre>
+frozen.c.d = 'foo'</code></pre>
 <p>The key things that happen when const assertions are being used are:</p>
 <ul>
 <li>no literal types in that expression should be widened (e.g. no going from <code>&quot;hello&quot;</code> to <code>string</code>)</li>
 <li>object literals get <code>readonly</code> properties</li>
 <li>array literals become <code>readonly</code> tuples</li>
 </ul>
-<h2 id="assert-functions-1"><a href="#assert-functions">Assert functions</a></h2>
+<h2><a href="#assert-functions">Assert functions</a></h2>
 <p>Added in <a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions">v3.7</a></p>
 <p>Assert functions are similar to <code>type guards</code> with the only difference that the function throws instead of returning a falsy value. This works on par with nodejs <a href="https://nodejs.org/docs/latest/api/assert.html"><code>assert</code></a> module.</p>
 <p>Using assert function you can validate an input ie</p>
-<pre><code class="language-typescript">function plainAssertion(arg: unknown): asserts arg {
+<pre class="language-typescript"><code class="language-typescript">function plainAssertion(arg: unknown): asserts arg {
     if (!arg) {
-        throw new Error(`arg is expected to be truthy, got &quot;${arg}&quot;`);
+        throw new Error(`arg is expected to be truthy, got "${arg}"`);
     }
 }
 
@@ -149,12 +143,11 @@ function foo(input: boolean, item: string | null) {
     item; // string | null
     plainAssertion(item);
     item; // string
-}
-</code></pre>
+}</code></pre>
 <p>Alternatively you can narrow down the type to be more specific. This is when the similarity with <code>type guards</code> shows.</p>
-<pre><code class="language-typescript">function specificAssertion(arg: unknown): asserts arg is string {
-    if (typeof arg !== &#39;string&#39;) {
-        throw new Error(`arg is expected to be string, got &quot;${arg}&quot;`)
+<pre class="language-typescript"><code class="language-typescript">function specificAssertion(arg: unknown): asserts arg is string {
+    if (typeof arg !== 'string') {
+        throw new Error(`arg is expected to be string, got "${arg}"`)
     }
 }
 
@@ -162,17 +155,16 @@ function bar(input: string | null) {
     input; // string | null
     specificAssertion(input);
     input; // string
-}
-</code></pre>
-<h2 id="key-remapping-in-mapped-types"><a href="#key-remapping-in-mapped-types">Key remapping in mapped types</a></h2>
+}</code></pre>
+<h2><a href="#key-remapping-in-mapped-types">Key remapping in mapped types</a></h2>
 <p>ie <code>{[K in keyof T as Foo]: T[K]}</code></p>
 <p>Added in <a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-1.html#key-remapping-in-mapped-types">v4.1</a></p>
 <p>Reminder of mapped type syntax in typescript</p>
-<pre><code class="language-typescript">type Inlined = {
-    [key in &#39;a&#39; | &#39;b&#39; | &#39;c&#39;]: string
+<pre class="language-typescript"><code class="language-typescript">type Inlined = {
+    [key in 'a' | 'b' | 'c']: string
 };
 
-type Keys = &#39;a&#39; | &#39;b&#39; | &#39;c&#39;;
+type Keys = 'a' | 'b' | 'c';
 type Aliased = {
     [key in Keys]: string
 };
@@ -180,34 +172,31 @@ type Aliased = {
 /**
  * both `Inlined` and `Aliased` have the type
  * `{a: string; b: string; c: string}`
- */
-</code></pre>
+ */</code></pre>
 <p>Even though the example in the typescript docs present this feature to be useful in many cases when working with object keys. There are times when there is no need for it.</p>
 <p>From the typescript docs:</p>
-<pre><code class="language-typescript">// Remove the &#39;kind&#39; property
-type RemoveKindField&lt;T&gt; = {
-    [K in keyof T as Exclude&lt;K, &quot;kind&quot;&gt;]: T[K]
+<pre class="language-typescript"><code class="language-typescript">// Remove the 'kind' property
+type RemoveKindField<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>T</span><span class="token punctuation">></span></span> = {
+    [K in keyof T as Exclude<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>K,</span> <span class="token attr-name">"kind"</span><span class="token punctuation">></span></span>]: T[K]
 };
 
 interface Circle {
-    kind: &quot;circle&quot;;
+    kind: "circle";
     radius: number;
 }
 
-type KindlessCircle = RemoveKindField&lt;Circle&gt;;
+type KindlessCircle = RemoveKindField<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>Circle</span><span class="token punctuation">></span></span>;
 //   ^ = type KindlessCircle = {
 //       radius: number;
-//   }
-</code></pre>
+//   }</code></pre>
 <p>This gets you the same result</p>
-<pre><code class="language-typescript">type RemoveKindField&lt;T&gt; = {
-    [K in Exclude&lt;keyof T, &quot;kind&quot;&gt;]: T[K]
-};
-</code></pre>
+<pre class="language-typescript"><code class="language-typescript">type RemoveKindField<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>T</span><span class="token punctuation">></span></span> = {
+    [K in Exclude<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>keyof</span> <span class="token attr-name">T,</span> <span class="token attr-name">"kind"</span><span class="token punctuation">></span></span>]: T[K]
+};</code></pre>
 <p>Where this feature shines is when you would like to remap the keys using template literal type with having the old key to extract the original value type.</p>
 <p>Example from typescript docs:</p>
-<pre><code class="language-typescript">type Getters&lt;T&gt; = {
-    [K in keyof T as `get${Capitalize&lt;string &amp; K&gt;}`]: () =&gt; T[K]
+<pre class="language-typescript"><code class="language-typescript">type Getters<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>T</span><span class="token punctuation">></span></span> = {
+    [K in keyof T as `get${Capitalize<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>string</span> <span class="token attr-name">&amp;</span> <span class="token attr-name">K</span><span class="token punctuation">></span></span>}`]: () => T[K]
 };
 
 interface Person {
@@ -216,13 +205,12 @@ interface Person {
     location: string;
 }
 
-type LazyPerson = Getters&lt;Person&gt;;
+type LazyPerson = Getters<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>Person</span><span class="token punctuation">></span></span>;
 //   ^ = type LazyPerson = {
-//       getName: () =&gt; string;
-//       getAge: () =&gt; number;
-//       getLocation: () =&gt; string;
-//   }
-</code></pre>
+//       getName: () => string;
+//       getAge: () => number;
+//       getLocation: () => string;
+//   }</code></pre>
 
     </article>
 </body>

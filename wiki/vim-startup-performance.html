@@ -74,12 +74,11 @@
 <li><code>:scriptnames</code> a built in command to display sourced files during the session.</li>
 </ul>
 <p>Both has great docs in vim.</p>
-<h2 id="startuptime-flag"><a href="#startuptime-flag">Startuptime flag</a></h2>
+<h2><a href="#startuptime-flag">Startuptime flag</a></h2>
 <p>Usage</p>
-<pre><code class="language-sh">vim --startuptime vim.log ./file-to-open
-</code></pre>
+<pre class="language-sh"><code class="language-sh">vim --startuptime vim.log ./file-to-open</code></pre>
 <p>After the bootup in <code>vim.log</code> you can see contents similar to</p>
-<pre><code>times in msec
+<pre class="language-"><code class="language-">times in msec
  clock   self+sourced   self:  sourced script
  clock   elapsed:              other lines
 
@@ -112,20 +111,19 @@
 113.268  001.180: VimEnter autocommands
 113.272  000.004: before starting main loop
 114.115  000.843: first screen update
-114.116  000.001: --- VIM STARTED ---
-</code></pre>
+114.116  000.001: --- VIM STARTED ---</code></pre>
 <p>The first column is a timestamp from the very start.</p>
 <p>The second is the time spent executing the specified file. Normally this number is under 50ms.</p>
-<h3 id="things-to-note"><a href="#things-to-note">Things to note</a></h3>
+<h3><a href="#things-to-note">Things to note</a></h3>
 <p>Most well written plugins load the core upon needing it aka lazyloading or autoloading in vim terms. Often this happens when dettecting an appropriate filetype, therefore depending on which file/directory you open when passing <code>--startuptime</code> flag the overall time may vary.</p>
-<h2 id="script-names-command"><a href="#script-names-command">Script names command</a></h2>
+<h2><a href="#script-names-command">Script names command</a></h2>
 <p>This commands lists all files that were sourced during the session. Due to some plugins autoloading their contents checking the list in the beggining of the session and some time after opening buffers with different filetypes, the list contents will differ.</p>
-<h2 id="practical-usage"><a href="#practical-usage">Practical usage</a></h2>
+<h2><a href="#practical-usage">Practical usage</a></h2>
 <ul>
 <li>if there are 50+ms files it makes sense to investigate or autoload/lazyload these plugins/settings.</li>
 <li>if it is an expensive plugin there might be lighter alternatives.</li>
 </ul>
-<h2 id="my-experience"><a href="#my-experience">My experience</a></h2>
+<h2><a href="#my-experience">My experience</a></h2>
 <p>I&#39;ve been able to shave off just under 200ms of my bootup time by performing the steps below:</p>
 <ol>
 <li><strong>Expensive plugins</strong> - <a href="https://github.com/preservim/nerdtree">Nerdtree plugin</a> was using over 50ms to load. Since I only used the shortcuts to add/copy/remove notes for nerdtree buffers. I was able to migrate to <a href="https://github.com/justinmk/vim-dirvish">dirvish</a> for directory viewing and wrote a tiny <a href="https://github.com/antonk52/dirvish-fs.vim">dirvish-fs plugin</a> to add nerdtree like shortcutes for fs manipulation. Sidenote: besides nerdtree being somewhat expensive on bootup it also is slow for large directories so ditching it was a win-win.</li>

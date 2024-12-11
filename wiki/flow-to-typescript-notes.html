@@ -56,9 +56,6 @@
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
 </head>
 
 <body>
@@ -72,23 +69,23 @@
         <h1>Flow to typescript migration notes</h1>
         
         <p>Core difference to note when switching from flow type system to typescript. I&#39;ve been mainly using flow v0.83, if you used newer versions your experience may vary.</p>
-<h2 id="why-static-types"><a href="#why-static-types">Why static types</a></h2>
+<h2><a href="#why-static-types">Why static types</a></h2>
 <ul>
 <li>Documentation</li>
 <li>Tests/contracts</li>
 <li>DX</li>
 <li>Type safety*</li>
 </ul>
-<h2 id="preword"><a href="#preword">Preword</a></h2>
+<h2><a href="#preword">Preword</a></h2>
 <p>⚠️ - marks things to pay close attention to</p>
-<h2 id="types-and-guarantees"><a href="#types-and-guarantees">Types and guarantees</a></h2>
+<h2><a href="#types-and-guarantees">Types and guarantees</a></h2>
 <p><img src="https://user-images.githubusercontent.com/5817809/112736958-c8e84200-8f67-11eb-872a-216ca432c5c8.png" alt="working-with-typed-programs"></p>
 <p>Types are about contract validation within your program. Unlike tests types have a chance to let the developer know what can go wrong before they finish the work.</p>
 <p>DX improvement - how few things people have to keep in their head while working on a project. Types help to reduce this load.</p>
-<h2 id="core-difference"><a href="#core-difference">Core difference</a></h2>
+<h2><a href="#core-difference">Core difference</a></h2>
 <p>Flow aims at being a sound type system. In other words flow might have false positives when raising an error.</p>
 <p>Typescript aims to be a complete type system. In other words typescript might have false negatives when raising an error. See <a href="https://github.com/Microsoft/TypeScript/wiki/TypeScript-Design-Goals#non-goals">non-goals</a>.</p>
-<h2 id="language-differences"><a href="#language-differences">Language differences</a></h2>
+<h2><a href="#language-differences">Language differences</a></h2>
 <ul>
 <li>Flow only provides type annotations</li>
 <li>Typescript expands javascript syntax with type annotation and the following:<ul>
@@ -102,9 +99,9 @@
 </ul>
 </li>
 </ul>
-<h2 id="structuralnominal-vs-structural-only"><a href="#structuralnominal-vs-structural-only">Structural/nominal vs structural only</a></h2>
+<h2><a href="#structuralnominal-vs-structural-only">Structural/nominal vs structural only</a></h2>
 <p>Flow has a mix of structural and <a href="https://en.wikipedia.org/wiki/Nominal_type_system">nominal types</a>(classes use nominal types).</p>
-<pre><code class="language-typescript">// @flow
+<pre class="language-typescript"><code class="language-typescript">// @flow
 
 class Foo {
   method(input: string): number { return 42 }
@@ -114,10 +111,9 @@ class Bar {
   method(input: string): number { return 42 }
 }
 
-let foo: Foo = new Bar() // ERROR!!
-</code></pre>
+let foo: Foo = new Bar() // ERROR!!</code></pre>
 <p>Typescript uses purely <a href="https://en.wikipedia.org/wiki/Structural_type_system">structural typing</a>.</p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 class Foo {
   method(input: string): number { return 42 }
@@ -127,113 +123,103 @@ class Bar {
   method(input: string): number { return 42 }
 }
 
-let foo: Foo = new Bar() // OK
-</code></pre>
+let foo: Foo = new Bar() // OK</code></pre>
 <!-- minor syntax diff -->
 
-<h2 id="suppression-comments"><a href="#suppression-comments">Suppression comments</a></h2>
+<h2><a href="#suppression-comments">Suppression comments</a></h2>
 <p>Flow marks every unused suppression comment as unused if there&#39;s no error. If used <code>include_warnings=true</code> unused suppressions are marked as errors.</p>
 <p>Typescript allows to have <code>// @ts-ignore</code> anywhere yet doesn&#39;t report it as an error/warning when there&#39;s no error to suppress ⚠️.</p>
 <p>In <a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-9.html#-ts-expect-error-comments">v3.9</a> a <code>// @ts-expect-error</code> was added which is reported as an error where there&#39;s no error to suppress.</p>
 <p>Both typescript and flow cannot suppress a specific error by error code or other methods.</p>
-<h2 id="maybe-values"><a href="#maybe-values">Maybe values</a></h2>
+<h2><a href="#maybe-values">Maybe values</a></h2>
 <p>Flow has maybe operator <code>?type</code> and typescript doesn&#39;t</p>
-<pre><code>// @flow
+<pre class="language-"><code class="language-">// @flow
 
 type A = ?string
 
 // the same as
-type B = string | void | null
-</code></pre>
-<pre><code class="language-typescript">// typescript
+type B = string | void | null</code></pre>
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
-type A = string | undefined | null
-</code></pre>
-<h2 id="dangerous-types"><a href="#dangerous-types">Dangerous types</a></h2>
+type A = string | undefined | null</code></pre>
+<h2><a href="#dangerous-types">Dangerous types</a></h2>
 <p>In flow <code>Object</code> type can be used to describe an object that can have any key and any value.</p>
-<pre><code class="language-typescript">// @flow
+<pre class="language-typescript"><code class="language-typescript">// @flow
 
 const obj: Object = {}
 
-// the same as {[string | number]: any}
-</code></pre>
+// the same as {[string | number]: any}</code></pre>
 <p>In typescript <code>Object</code> type is the actual Object constructor, which means almost every value can assigned to it</p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 const bool: Object = true // ok
-const str: Object = &#39;foo&#39; // ok
+const str: Object = 'foo' // ok
 const num: Object = 123 // ok
 
-const nil: Object = null // err
-</code></pre>
+const nil: Object = null // err</code></pre>
 <p>If you need the &quot;whatever&quot; object type in typescript you can use the <code>object</code> type with lowercase o</p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 const obj1: object = {} // ok
 
 const obj2: object = {
-    a: &#39;string&#39;,
+    a: 'string',
     b: true,
     c: 123,
     d: null,
-} // ok
-</code></pre>
-<pre><code class="language-typescript">// @flow
+} // ok</code></pre>
+<pre class="language-typescript"><code class="language-typescript">// @flow
 
 const obj1: Object = {} // ok
 
 const obj2: Object = {
-    a: &#39;string&#39;,
+    a: 'string',
     b: true,
     c: 123,
     d: null,
-} // ok
-</code></pre>
+} // ok</code></pre>
 <p>Other dangerous types can be <code>Function</code> or <code>{}</code>. See <a href="https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/ban-types.md">ban-types</a> eslint rule from typescript-eslint-plugin.</p>
-<h2 id="named-arguments--keys"><a href="#named-arguments--keys">Named arguments / keys</a></h2>
+<h2><a href="#named-arguments--keys">Named arguments / keys</a></h2>
 <p>In Flow one does not have to specify argument or object key names in order to provide a type annotation.</p>
-<pre><code class="language-typescript">// @flow
+<pre class="language-typescript"><code class="language-typescript">// @flow
 
 const func
-    : string =&gt; void
-    = (arg) =&gt; console.log(arg)
+    : string => void
+    = (arg) => console.log(arg)
 
 const obj
     : {[string]: number}
-    = {foo: 1}
-</code></pre>
+    = {foo: 1}</code></pre>
 <p>Typescript marks this code with errors forcing users to provide a more explanatory names that will be used in type hints</p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 const func
-    : (arg: string) =&gt; void
-    = (arg) =&gt; console.log(arg)
+    : (arg: string) => void
+    = (arg) => console.log(arg)
 
 const obj
     : {[key: string]: number}
-    = {foo: 1}
-</code></pre>
+    = {foo: 1}</code></pre>
 <img width="372" alt="Screen Shot 2021-03-28 at 5 00 30 PM" src="https://user-images.githubusercontent.com/5817809/112754957-3d15fa80-8fe7-11eb-9bc4-dad86c5f149b.png">
 
-<h2 id="jsdoc-support"><a href="#jsdoc-support">JSDoc support</a></h2>
+<h2><a href="#jsdoc-support">JSDoc support</a></h2>
 <p>Typescript has support for <a href="https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html">JSDoc comments</a> and will show you them on type hits.</p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 /**
  * Does cool stuff
  *
  * @example
  *
- * `foo(&#39;hey&#39;, &#39;you&#39;) =&gt; &#39;hey, you&#39;`
+ * `foo('hey', 'you') => 'hey, you'`
  */
-type Foo = (start: string, end: string) =&gt; string
-</code></pre>
+type Foo = (start: string, end: string) => string</code></pre>
 <p>Preview:</p>
 <p><img src="https://user-images.githubusercontent.com/5817809/112764820-f2aa7300-9012-11eb-9b34-277e5dc51311.png" alt="Screen Shot 2021-03-28 at 10 12 19 PM"></p>
 <p>✅ It&#39;s a good idea to always include comments for utility functions.</p>
-<h2 id="intersection--spread-object-types"><a href="#intersection--spread-object-types">Intersection / spread object types</a></h2>
+<h2><a href="#intersection--spread-object-types">Intersection / spread object types</a></h2>
 <p>In flow you can &quot;merge&quot; object types by using intersection or by spreading types. Spreads create an inexact object type therefore if we need an exact one we have to specify it with <code>{||}</code> syntax.</p>
-<pre><code class="language-typescript">// @flow
+<pre class="language-typescript"><code class="language-typescript">// @flow
 
 type A = {a: string}
 type B = {b: number}
@@ -245,10 +231,9 @@ type AB = {a: boolean, b: boolean}
 
 type AB_3 = {...A, ...B, ...AB} // {a: boolean, b: boolean}
 
-type AB_3_strict = {|...A, ...B, ...AB|} // {|a: boolean, b: boolean|}
-</code></pre>
+type AB_3_strict = {|...A, ...B, ...AB|} // {|a: boolean, b: boolean|}</code></pre>
 <p>In typescript we cannot spread object types though the experience is pretty similar.</p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 type A = {a: string}
 type B = {b: number}
@@ -259,9 +244,8 @@ type AB = {a: boolean, b: boolean}
 
 type AB_3 = A &amp; B &amp; AB // never 😳
 
-type FML = string &amp; number // never
-</code></pre>
-<pre><code class="language-typescript">// typescript
+type FML = string &amp; number // never</code></pre>
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 interface A {
     a: string
@@ -271,35 +255,33 @@ interface B extends A {
 //        ^ error
     a: number
 }
-// Interface &#39;B&#39; incorrectly extends interface &#39;A&#39;.
-//  Types of property &#39;a&#39; are incompatible.
-//    Type &#39;number&#39; is not assignable to type &#39;string&#39;.
-</code></pre>
+// Interface 'B' incorrectly extends interface 'A'.
+//  Types of property 'a' are incompatible.
+//    Type 'number' is not assignable to type 'string'.</code></pre>
 <p>When intersecting object with the same key TS attemps to find the common type between the value types under the common key.</p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
-type Strs = &#39;A&#39; | &#39;B&#39; | &#39;C&#39;
-type Str = &#39;A&#39;
+type Strs = 'A' | 'B' | 'C'
+type Str = 'A'
 
 type IntStr = Strs &amp; Str
 
-const a: IntStr = &#39;A&#39; // ok
-const b: IntStr = &#39;B&#39; // error
-const c: IntStr = &#39;C&#39; // error
+const a: IntStr = 'A' // ok
+const b: IntStr = 'B' // error
+const c: IntStr = 'C' // error
 
 // ===============
 
-type A1 = {prop: &#39;A&#39; | &#39;B&#39; | &#39;C&#39;}
-type A2 = {prop: &#39;A&#39;}
+type A1 = {prop: 'A' | 'B' | 'C'}
+type A2 = {prop: 'A'}
 
 type Intersection = A1 &amp; A2
 
-const a: Intersection = {prop: &#39;A&#39;} // ok
-const b: Intersection = {prop: &#39;B&#39;} // error
-const c: Intersection = {prop: &#39;C&#39;} // error
-</code></pre>
+const a: Intersection = {prop: 'A'} // ok
+const b: Intersection = {prop: 'B'} // error
+const c: Intersection = {prop: 'C'} // error</code></pre>
 <p>To get a similar result as object spreads in flow we can add a utility type like <code>ShallowMerge</code></p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 type A = {a: string}
 type B = {b: number}
@@ -307,64 +289,59 @@ type B = {b: number}
 type AB_1 = A &amp; B // {a: string, b: number}
 
 type AB = {a: boolean, b: boolean}
-type ShallowMerge&lt;A extends object, B extends object&gt; = Omit&lt;A, keyof B&gt; &amp; B
+type ShallowMerge<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>A</span> <span class="token attr-name">extends</span> <span class="token attr-name">object,</span> <span class="token attr-name">B</span> <span class="token attr-name">extends</span> <span class="token attr-name">object</span><span class="token punctuation">></span></span> = Omit<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>A,</span> <span class="token attr-name">keyof</span> <span class="token attr-name">B</span><span class="token punctuation">></span></span> &amp; B
 
-type AB_merged = ShallowMerge&lt;A, AB&gt; // {a: boolean, b: boolean}
-</code></pre>
-<h2 id="type-casting"><a href="#type-casting">Type casting</a></h2>
-<pre><code class="language-typescript">// @flow
+type AB_merged = ShallowMerge<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>A,</span> <span class="token attr-name">AB</span><span class="token punctuation">></span></span> // {a: boolean, b: boolean}</code></pre>
+<h2><a href="#type-casting">Type casting</a></h2>
+<pre class="language-typescript"><code class="language-typescript">// @flow
 
-const str = &#39;foobar&#39;
+const str = 'foobar'
 
 str // string
 
 const func = ((str: any): Function)
 
-func() // ok
-</code></pre>
-<pre><code class="language-typescript">// typescript
+func() // ok</code></pre>
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
-const str = &#39;foobar&#39;
+const str = 'foobar'
 
 str // string
 
 const func = (str as any) as Function
 
-func() // ok
-</code></pre>
+func() // ok</code></pre>
 <p>This feature should be avoided when possible.</p>
-<h2 id="difference-between-void--undefined-in-typescript">Difference between <code>void</code> &amp; <code>undefined</code> in typescript</h2>
+<h2>Difference between <code>void</code> &amp; <code>undefined</code> in typescript</h2>
 <p>In flow one uses <code>void</code> at all times. In typescript you use <code>undefined</code> where it is an expected value to be used and <code>void</code> otherwise. For example for a function which result should not be used.</p>
-<pre><code class="language-typescript">// @flow
+<pre class="language-typescript"><code class="language-typescript">// @flow
 
 const func
-    : string =&gt; void
-    = (arg) =&gt; console.log(arg)
+    : string => void
+    = (arg) => console.log(arg)
 
 if (func()) { // ok
-}
-</code></pre>
-<pre><code class="language-typescript">// typescript
+}</code></pre>
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 const func
-    : (arg: string) =&gt; void
-    = (arg) =&gt; console.log(arg)
+    : (arg: string) => void
+    = (arg) => console.log(arg)
 
-if (func()) { // error: An expression of type &#39;void&#39; cannot be tested for truthiness.(1345)
+if (func()) { // error: An expression of type 'void' cannot be tested for truthiness.(1345)
 }
 
 const bar: undefined = void 0
 
 if (bar) { // ok
-}
-</code></pre>
-<h2 id="typed-this">Typed <code>this</code></h2>
+}</code></pre>
+<h2>Typed <code>this</code></h2>
 <p>In flow you cannot specify the type for <code>this</code> for functions</p>
 <p>In typescript you can specify the type by naming the first argument type <code>this</code></p>
-<pre><code class="language-typescript">// typescript in
-function HtmlPage(this: {redirect: (url: string) =&gt; void}, params: Record&lt;string, string&gt;) {
-    if (typeof params.id !== &#39;string&#39;) {
-        this.redirect(&#39;/login&#39;)
+<pre class="language-typescript"><code class="language-typescript">// typescript in
+function HtmlPage(this: {redirect: (url: string) => void}, params: Record<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>string,</span> <span class="token attr-name">string</span><span class="token punctuation">></span></span>) {
+    if (typeof params.id !== 'string') {
+        this.redirect('/login')
     }
 
     // logic
@@ -372,16 +349,15 @@ function HtmlPage(this: {redirect: (url: string) =&gt; void}, params: Record&lt;
 
 // javascript out
 function HtmlPage(params) {
-    if (typeof params.id !== &#39;string&#39;) {
-        this.redirect(&#39;/login&#39;)
+    if (typeof params.id !== 'string') {
+        this.redirect('/login')
     }
 
     // logic
-}
-</code></pre>
-<h2 id="any-vs-mixed-in-flow-or-any-vs-unknown-in-typescript"><code>any</code> vs <code>mixed</code> in flow or <code>any</code> vs <code>unknown</code> in typescript</h2>
+}</code></pre>
+<h2><code>any</code> vs <code>mixed</code> in flow or <code>any</code> vs <code>unknown</code> in typescript</h2>
 <p><code>any</code> is a hack in both type systems ⚠️. It is both a subtype and a supertype of every type. This is why you can use it in any way</p>
-<pre><code class="language-typescript">function foo(arg: any) {
+<pre class="language-typescript"><code class="language-typescript">function foo(arg: any) {
     arg(null)
 
     arg(1, 2, 3)
@@ -393,19 +369,18 @@ function HtmlPage(params) {
     arg.has(42)
 
     arg.then(someFunc)
-} // ok
-</code></pre>
+} // ok</code></pre>
 <p>There is a type to represent an unknown value in both type systems, it typescript it is called <code>unknown</code> and in flow we have <code>mixed</code></p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 function foo(arg: unknown) {
-    if (typeof arg === &#39;function&#39;) {
+    if (typeof arg === 'function') {
         arg(null)
 
         arg(1, 2, 3)
     }
 
-    if (typeof arg === &#39;number&#39;) {
+    if (typeof arg === 'number') {
         arg.toFixed(5)
     }
 
@@ -420,10 +395,9 @@ function foo(arg: unknown) {
     if (arg instanceof Promise) {
         arg.then(someFunc)
     }
-} // ok
-</code></pre>
+} // ok</code></pre>
 <p>⚠️ Avoid using <code>any</code> at all costs</p>
-<h2 id="type-narrowing-aka-type-refinement"><a href="#type-narrowing-aka-type-refinement">Type narrowing a.k.a. type refinement</a></h2>
+<h2><a href="#type-narrowing-aka-type-refinement">Type narrowing a.k.a. type refinement</a></h2>
 <p><a href="https://www.typescriptlang.org/docs/handbook/2/narrowing.html">typescript</a></p>
 <p><a href="https://flow.org/en/docs/lang/refinements/">flow</a></p>
 <p>Kinds of guards:</p>
@@ -433,21 +407,20 @@ function foo(arg: unknown) {
 <li>Equality narrowing <code>===</code>/<code>==</code>/<code>!==</code>/<code>!=</code></li>
 <li><code>instanceof</code> narrowing</li>
 </ul>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 function foo(arg: string) {
-    if ([&#39;A&#39;, &#39;B&#39;].includes(arg)) {
+    if (['A', 'B'].includes(arg)) {
         arg // string
     }
 
-    if (arg === &#39;A&#39; || arg === &#39;B&#39;) {
-        arg // &#39;A&#39; | &#39;B&#39;
+    if (arg === 'A' || arg === 'B') {
+        arg // 'A' | 'B'
     }
-}
-</code></pre>
-<h2 id="type-guards"><a href="#type-guards">Type guards</a></h2>
+}</code></pre>
+<h2><a href="#type-guards">Type guards</a></h2>
 <p>Both <a href="https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates">typescript</a> and <a href="https://flow.org/en/docs/types/functions/#toc-predicate-functions">flow</a> have type guards.</p>
 <p>Example: let&#39;s check that the given nullable variable is not in fact <code>null</code></p>
-<pre><code class="language-typescript">// @flow
+<pre class="language-typescript"><code class="language-typescript">// @flow
 
 function isNonNullable(arg: string | null | void): boolean %checks {
     return arg != null
@@ -457,24 +430,22 @@ function foo(arg: ?string) {
     if (isNonNullable(arg)) {
         arg // string
     }
-}
-</code></pre>
-<pre><code class="language-typescript">// typescript
+}</code></pre>
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 function isNonNullable(arg: string | null | undefined): arg is string {
     return arg != null
-    // return typeof arg === &#39;string&#39;
+    // return typeof arg === 'string'
 }
 
 function foo(arg: string | null | undefined) {
     if (isNonNullable(arg)) {
         arg // string
     }
-}
-</code></pre>
-<h3 id="handling-sloppy-cases"><a href="#handling-sloppy-cases">Handling sloppy cases</a></h3>
+}</code></pre>
+<h3><a href="#handling-sloppy-cases">Handling sloppy cases</a></h3>
 <p>Flow forces you to check the type withing your type predicate</p>
-<pre><code class="language-typescript">// @flow
+<pre class="language-typescript"><code class="language-typescript">// @flow
 
 function isNonNullable(arg: string | null | void): boolean %checks {
     return true // &lt;-- sloppy check
@@ -485,9 +456,8 @@ function foo(arg: ?string) {
         arg // ?string
         //     ^ note the `?`
     }
-}
-</code></pre>
-<pre><code class="language-typescript">// typescript
+}</code></pre>
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 function isNonNullable(arg: string | null | undefined): arg is string {
     return true
@@ -498,13 +468,12 @@ function foo(arg: string | null | undefined) {
         arg // string
         //     ^^^^^^ still works 😳
     }
-}
-</code></pre>
+}</code></pre>
 <p>⚠️ Pay close attention to type predicates, typescript won&#39;t guard you from writing sloppy checks</p>
-<h2 id="type-assertion"><a href="#type-assertion">Type assertion</a></h2>
-<h3 id="non-null-assertion-operator"><a href="#non-null-assertion-operator">Non-null assertion operator</a></h3>
+<h2><a href="#type-assertion">Type assertion</a></h2>
+<h3><a href="#non-null-assertion-operator">Non-null assertion operator</a></h3>
 <p>Unlike flow typescript expands javascript syntax. An example can be <a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html#non-null-assertion-operator">non-null assertion operator</a>. Its usage does not affect the runtime, ie it can be dangerous ⚠️</p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 declare function foo(): null | {prop: string}
 
@@ -514,58 +483,55 @@ foo()!.prop // ok
 //   ^ this
 
 // transpiled javascript
-foo().prop
-</code></pre>
-<h3 id="const-assertions"><a href="#const-assertions">Const assertions</a></h3>
+foo().prop</code></pre>
+<h3><a href="#const-assertions">Const assertions</a></h3>
 <p><code>const foo = {} as const</code></p>
 <p>Added in <a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-4.html#const-assertions">v3.4</a></p>
 <p>This feature allows you to disable type widening when declaring values in typescript.</p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
-const plainObj = {a: 1, b: &#39;foo&#39;}
+const plainObj = {a: 1, b: 'foo'}
 
 plainObj // {a: number; b: string}
 
-const constObj = {a: 1, b: &#39;foo&#39;} as const
+const constObj = {a: 1, b: 'foo'} as const
 
-constObj // {readonly a: 1; readonly b: &#39;foo&#39;}
-</code></pre>
+constObj // {readonly a: 1; readonly b: 'foo'}</code></pre>
 <p>This is <strong>not</strong> the same as using <code>Object.freeze</code></p>
-<pre><code class="language-typescript">// typescript
-const constObj = {a: 1, b: &#39;foo&#39;, c: {d: &#39;bar&#39;}} as const
+<pre class="language-typescript"><code class="language-typescript">// typescript
+const constObj = {a: 1, b: 'foo', c: {d: 'bar'}} as const
 
-constObj // {readonly a: 1, readonly b: &#39;foo&#39;, readonly c: {readonly d: &#39;bar}}
+constObj // {readonly a: 1, readonly b: 'foo', readonly c: {readonly d: 'bar}}
 
-// @ts-expect-error Cannot assign to &#39;d&#39; because it is a read-only property.
-constObj.c.d = &#39;foo&#39;
+// @ts-expect-error Cannot assign to 'd' because it is a read-only property.
+constObj.c.d = 'foo'
 
 // ------------------------
 
-const frozen = Object.freeze({a: 1, b: &#39;foo&#39;, c: {d: &#39;bar&#39;}})
+const frozen = Object.freeze({a: 1, b: 'foo', c: {d: 'bar'}})
 
-frozen // Readonly&lt;{a: number; b: string; c: {d: string}}&gt;
+frozen // Readonly<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">{a:</span></span> <span class="token attr-name">number;</span> <span class="token attr-name"><span class="token namespace">b:</span></span> <span class="token attr-name">string;</span> <span class="token attr-name"><span class="token namespace">c:</span></span> <span class="token attr-name"><span class="token namespace">{d:</span></span> <span class="token attr-name">string}}</span><span class="token punctuation">></span></span>
 
-// @ts-expect-error Cannot assign to &#39;b&#39; because it is a read-only property.
-frozen.b = &#39;foo 2&#39;
+// @ts-expect-error Cannot assign to 'b' because it is a read-only property.
+frozen.b = 'foo 2'
 
 // no error since `Readonly` is not deep
-frozen.c.d = &#39;foo&#39;
-</code></pre>
+frozen.c.d = 'foo'</code></pre>
 <p>The key things that happen when const assertions are being used are:</p>
 <ul>
 <li>no literal types in that expression should be widened (e.g. no going from <code>&quot;hello&quot;</code> to <code>string</code>)</li>
 <li>object literals get <code>readonly</code> properties</li>
 <li>array literals become <code>readonly</code> tuples</li>
 </ul>
-<h3 id="assert-functions"><a href="#assert-functions">Assert functions</a></h3>
+<h3><a href="#assert-functions">Assert functions</a></h3>
 <p>Added in <a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions">v3.7</a></p>
 <p>Assert functions are similar to <code>type guards</code> with the only difference that the function throws instead of returning a falsy value. This works on par with nodejs <a href="https://nodejs.org/docs/latest/api/assert.html"><code>assert</code></a> module.</p>
 <p>Using assert function you can validate an input ie</p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 function plainAssertion(arg: unknown): asserts arg {
     if (!arg) {
-        throw new Error(`arg is expected to be truthy, got &quot;${arg}&quot;`)
+        throw new Error(`arg is expected to be truthy, got "${arg}"`)
     }
 }
 
@@ -577,21 +543,20 @@ function foo(input: boolean, item: string | null) {
     item // string | null
     plainAssertion(item)
     item // string
-}
-</code></pre>
+}</code></pre>
 <p>Alternatively you can narrow down the type to be more specific. This is when the similarity with <code>type guards</code> shows.</p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 type Item = {
-    type: &#39;item&#39;;
+    type: 'item';
 }
 
 function assertItem(arg: unknown): asserts arg is Item {
-    if (isObject(arg) &amp;&amp; &#39;type&#39; in arg &amp;&amp; arg.type === &#39;item&#39;) {
+    if (isObject(arg) &amp;&amp; 'type' in arg &amp;&amp; arg.type === 'item') {
         return arg
     }
 
-    throw new Error(`arg is expected to be an Item, got &quot;${arg}&quot;`)
+    throw new Error(`arg is expected to be an Item, got "${arg}"`)
 }
 
 function getItemById(state: State, id: string): Item | undefined {
@@ -612,10 +577,9 @@ function getItemByIdSafe(state: State, id: string): Item {
     item // Item
 
     return item
-}
-</code></pre>
+}</code></pre>
 <p>The same as plain type guards you don&#39;t have to validate the entire object scheme to guard other values. In other words the below code is OK for typescript standards ⚠️</p>
-<pre><code class="language-typescript">function assertWhatever(arg: unknown): asserts arg is Item {
+<pre class="language-typescript"><code class="language-typescript">function assertWhatever(arg: unknown): asserts arg is Item {
     return undefined
 }
 
@@ -625,13 +589,12 @@ function foo(arg: unknown) {
     assertWhatever(arg)
 
     arg // Item
-}
-</code></pre>
+}</code></pre>
 <!-- intermediate diff -->
 
-<h2 id="type-narrowing-invalidation"><a href="#type-narrowing-invalidation">Type narrowing invalidation</a></h2>
+<h2><a href="#type-narrowing-invalidation">Type narrowing invalidation</a></h2>
 <p>Flow has so called <a href="https://flow.org/en/docs/lang/refinements/#toc-refinement-invalidations">refinement invalidations</a></p>
-<pre><code class="language-typescript">// @flow
+<pre class="language-typescript"><code class="language-typescript">// @flow
 function func(value: { prop?: string }) {
     if (value.prop) {
         value.prop // string
@@ -640,10 +603,9 @@ function func(value: { prop?: string }) {
         // $ExpectError
         value.prop.charAt(0)
     }
-}
-</code></pre>
+}</code></pre>
 <p>Once we checked for <code>value.prop</code> value, the refined type is string. However if we call something within the current scope. Flow invalidated the refinement since it is possible that the object <code>value</code> was mutated within <code>otherMethod</code>. To avoid the invalidation one can extract the primitive value into its own variable ie</p>
-<pre><code class="language-typescript">// @flow
+<pre class="language-typescript"><code class="language-typescript">// @flow
 function func(value: { prop?: string }) {
     if (value.prop) {
         const {prop} = value
@@ -653,85 +615,79 @@ function func(value: { prop?: string }) {
         value.prop // void | string
         prop.charAt(0)
     }
-}
-</code></pre>
+}</code></pre>
 <p>Typescript is missing this feature on purpose since its <a href="https://github.com/microsoft/TypeScript/wiki/TypeScript-Design-Goals">goals</a> aim at being a complete type system rather than sound.</p>
-<h2 id="strict-vs-loose-objects"><a href="#strict-vs-loose-objects">Strict vs loose objects</a></h2>
+<h2><a href="#strict-vs-loose-objects">Strict vs loose objects</a></h2>
 <p>Flow has syntax to specify whether the objects has a specified set of fields and nothing more aka strict or non extensible or is loose aka can have other non specified fields</p>
-<pre><code class="language-typescript">// @flow
+<pre class="language-typescript"><code class="language-typescript">// @flow
 type L = {a: number}
 const loose_1: L = {a: 1} // ok
-const loose_2: L = {a: 1, b: &#39;str&#39;, c: true} // ok
+const loose_2: L = {a: 1, b: 'str', c: true} // ok
 
 type S = {|a: number|}
 const strict_1: L = {a: 1} // ok
-const strict_2: L = {a: 1, b: &#39;str&#39;, c: true} // error
-</code></pre>
+const strict_2: L = {a: 1, b: 'str', c: true} // error</code></pre>
 <p>In typescript objects are &quot;strict&quot; by default</p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 type O = {a: number}
 const obj_1: O = {a: 1} // ok
-const obj_2: O = {a: 1, b: &#39;str&#39;, c: true} // error
-</code></pre>
+const obj_2: O = {a: 1, b: 'str', c: true} // error</code></pre>
 <p>However this does not always guarantee that typescript wont raise errors about unwanted fields.</p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 type A = {a: number}
 
 declare function takesA(arg: A): void
 
 takesA({a: 1}) // ok
-takesA({a: 1, b: &#39;foo&#39;}) // error
+takesA({a: 1, b: 'foo'}) // error
 
 // -----------------
 
-const x = {a: 1, b: &#39;foo&#39;}
-takesA(x) // ok 😳
-</code></pre>
+const x = {a: 1, b: 'foo'}
+takesA(x) // ok 😳</code></pre>
 <p>According to typescript this is a valid code. <a href="https://www.typescriptlang.org/play?#code/C4TwDgpgBAggQlAvFA3gQwFxQEYHtcA2EaAdgDQ5Z6HEkC+AUKJFAMJKoDGV+RpjzaAFUAcgEkA8iI7woAHzYMGnXCQDOwKLmwArLKMnTkKbFmAAnAK4QK3KBet0gA">playground</a></p>
-<pre><code class="language-typescript">type AB = {a: boolean, b: boolean}
+<pre class="language-typescript"><code class="language-typescript">type AB = {a: boolean, b: boolean}
 type C = {c: boolean}
 type UNION = AB | C
 
-const obj: UNION = {b: true, c: true} // ok 😳
-</code></pre>
-<h2 id="tuple-bugs"><a href="#tuple-bugs">Tuple Bugs</a></h2>
+const obj: UNION = {b: true, c: true} // ok 😳</code></pre>
+<h2><a href="#tuple-bugs">Tuple Bugs</a></h2>
 <p>Typescript <a href="https://github.com/microsoft/TypeScript/issues/6594#issuecomment-174315415">issue</a> for context</p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 const a: number[][] = [[1,2], [3,4]]
 const b: number[] = [1,2]
 const c: number[][] = a.concat(b) // no error
 
 c // typescript type `number[][]`
-c // runtime value `[[1,2], [3,4], 1, 2]`
-</code></pre>
+c // runtime value `[[1,2], [3,4], 1, 2]`</code></pre>
 <p><a href="https://www.typescriptlang.org/play?#code/MYewdgzgLgBAhgLhmArgWwEYFMBOBtAXUJgF4Y88BGAGgCYDryBmagFgIIChRJYMlUmXMTJU6XHtBjAB6bPiIFS8AHQ9gcKAAoMASk7cYAeiMwoATwAOWCMBwBLS7AvWYAA0HzChN4ZMwcFDAoezQsGAA3OAAbFHC3Chp6RjwWdkYaGHo3IA">ts playground</a>
 <a href="https://flow.org/try/#0MYewdgzgLgBAhgLhmArgWwEYFMBOBtAXUJgF4Y88BGAGgCYDryBmagFgIIChRJYMlUmXMTJU6XHtBjAB6bPiIFS8AHQ9gcKAAoMASk7cYAeiMwoATwAOWCMBwBLS7AvWYAA0HzChN4ZMwcFDAoezQsGAA3OAAbFHC3Chp6RjwWdkYaGHo3IA">flow raises an error as expected</a></p>
-<h2 id="enums"><a href="#enums">Enums</a></h2>
+<h2><a href="#enums">Enums</a></h2>
 <p>see <a href="https://www.typescriptlang.org/play?#code/KYOwrgtgBACgNgQwJYigbwFBW1A9iYAGixwBcB3XYnKUgCwCdhgMBfDDUSKAOQQmAATdCWz5gUALxQA5OJnUylKbIq4Fo2o2YqZ9JsBlsOAY3wBnUlC7QAwhauYa43fMXY1utRpr6d0vW1DYwxSAE8ABwkAUXAIAGlgMPMVAGsk3AAzWkjgLNhEFABuKAB6UqgAInFKqAAfKrVahsq-YEqOTLAQE1IkfChM3FwACgjCkAAuAuQQQigQfiFpvgFBeZMzEEtp+23SAEoRGiRssYmpSQD5I7RWMorgBgZcBmn6CXColJl4WZkoAgQMIZJYGCgAOYAugIABuEhAuDw8IYiAiADoOCczuNZpdpH8UOjxLdNDRcSgHjMieJNOxNKcoCNFmt8bwloJiQRSTQaCyhFTVkIuSwaPTsUzNg42XtLCKebzsFL9lTZaQRXSQkNRnICApVJR9YEDDIjuVrM9Xu9crJqgRKgCkClEVYEOZzEgIYsAEZwT5IiIIBhLUhPPDZL4SX4TIwYbUjQkgEXzIWctTzNXotoHIA">play</a></p>
-<pre><code class="language-typescript">enum Plain {
+<pre class="language-typescript"><code class="language-typescript">enum Plain {
     one,
     two,
     three
 }
 
 enum Named {
-    one = &#39;one&#39;,
-    two = &#39;two&#39;,
-    three = &#39;three&#39;
+    one = 'one',
+    two = 'two',
+    three = 'three'
 }
 
 const enum Const {
-    one = &#39;one&#39;,
-    two = &#39;two&#39;,
-    three = &#39;three&#39;
+    one = 'one',
+    two = 'two',
+    three = 'three'
 }
 
-type EnumKeys = keyof typeof Plain; // &quot;one&quot; | &quot;two&quot; | &quot;three&quot;
+type EnumKeys = keyof typeof Plain; // "one" | "two" | "three"
 
 function foo(plain: Plain, named: Named, cconst: Const) {
-    if (plain === &#39;one&#39;) {} // error: the types &#39;Plain&#39; and &#39;string&#39; have no overlap.
+    if (plain === 'one') {} // error: the types 'Plain' and 'string' have no overlap.
 
     if (plain === Plain.one) {
         plain // Plain.one
@@ -746,13 +702,12 @@ function foo(plain: Plain, named: Named, cconst: Const) {
     }
 }
 
-foo(&#39;one&#39;, &#39;two&#39;, &#39;three&#39;) // error: type &#39;&quot;one&quot;&#39; is not assignable to parameter of type &#39;Plain&#39;
+foo('one', 'two', 'three') // error: type '"one"' is not assignable to parameter of type 'Plain'
 
-foo(Plain.one, Named.two, Const.three)
-</code></pre>
-<h2 id="opaque-types"><a href="#opaque-types">Opaque types</a></h2>
+foo(Plain.one, Named.two, Const.three)</code></pre>
+<h2><a href="#opaque-types">Opaque types</a></h2>
 <p>Flow has support for <code>opaque</code> type aliases. They are the same as regular type aliases but do not allow access to their underlying type outside of the file in which they are defined.</p>
-<pre><code class="language-typescript">// @flow
+<pre class="language-typescript"><code class="language-typescript">// @flow
 
 // a.js
 
@@ -764,54 +719,50 @@ declare function getUserById(id: UserId): User | void
 
 // b.js (has to be a different file)
 
-getUserById(&#39;1234&#39;) // error
+getUserById('1234') // error
 
-const someId: UserId = &#39;4321&#39;
+const someId: UserId = '4321'
 
-getUserById(someId) // ok
-</code></pre>
+getUserById(someId) // ok</code></pre>
 <p>Typescript does not have such feature since it is not nominal yet you can get somewhat similar result</p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
-type Brand&lt;K, T&gt; = K &amp; { __brand: T }
+type Brand<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>K,</span> <span class="token attr-name">T</span><span class="token punctuation">></span></span> = K &amp; { __brand: T }
 
-type UserId = Brand&lt;string, &#39;userId&#39;&gt;
+type UserId = Brand<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>string,</span> <span class="token attr-name">'userId'</span><span class="token punctuation">></span></span>
 type User = {id: UserId, name: string}
 
 declare function getUserById(id: UserId): User | void
 
-getUserById(&#39;1234&#39;) // error
+getUserById('1234') // error
 
-const someId: UserId = &#39;4321&#39;
-//    ^^^^^^ Type &#39;string&#39; is not assignable to type &#39;{ __brand: &quot;userId&quot;; }&#39;.
+const someId: UserId = '4321'
+//    ^^^^^^ Type 'string' is not assignable to type '{ __brand: "userId"; }'.
 
-const castedId = &#39;4321&#39; as UserId // have to cast explicitly
+const castedId = '4321' as UserId // have to cast explicitly
 
-getUserById(castedId) // ok
-</code></pre>
+getUserById(castedId) // ok</code></pre>
 <p>This has an issue since these &quot;branded&quot; types cannot be used to index collections.</p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
-type UserCollection = Record&lt;UserId, User&gt;
+type UserCollection = Record<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>UserId,</span> <span class="token attr-name">User</span><span class="token punctuation">></span></span>
 
 const userCollection: UserCollection = {}
 
 let a = userCollection[castedId]
-//      ^^^^^^^^^^^^^^^^^^^^^^^^ Element implicitly has an &#39;any&#39; type because expression of
-//                               type &#39;UserId&#39; can&#39;t be used to index type &#39;UserCollection&#39;
-</code></pre>
-<h2 id="mapped-types"><a href="#mapped-types">Mapped types</a></h2>
+//      ^^^^^^^^^^^^^^^^^^^^^^^^ Element implicitly has an 'any' type because expression of
+//                               type 'UserId' can't be used to index type 'UserCollection'</code></pre>
+<h2><a href="#mapped-types">Mapped types</a></h2>
 <p>For the typical <code>$ObjMap</code> &amp; <code>$ObjMapi</code> enjoyers, typescript cannot call functions at a type level therefore they have a syntax for mapping over a union</p>
-<pre><code class="language-typescript">// typescript
-type Union = &#39;A&#39; | &#39;B&#39; | &#39;C&#39;
+<pre class="language-typescript"><code class="language-typescript">// typescript
+type Union = 'A' | 'B' | 'C'
 
 type Obj = {
     [K in Union]: K;
 }
 
-// typeof Obj -&gt; {A: &#39;A&#39;; B: &#39;B&#39;; C: &#39;C&#39;}
-</code></pre>
-<h2 id="built-in-utils"><a href="#built-in-utils">Built-in utils</a></h2>
+// typeof Obj -> {A: 'A'; B: 'B'; C: 'C'}</code></pre>
+<h2><a href="#built-in-utils">Built-in utils</a></h2>
 <ul>
 <li>Partial</li>
 <li>Required</li>
@@ -830,16 +781,16 @@ type Obj = {
 <li>OmitThisParameter</li>
 <li>ThisType</li>
 </ul>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
-type Record&lt;K extends string | number | symbol, T&gt; = {
+type Record<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>K</span> <span class="token attr-name">extends</span> <span class="token attr-name">string</span> <span class="token attr-name">|</span> <span class="token attr-name">number</span> <span class="token attr-name">|</span> <span class="token attr-name">symbol,</span> <span class="token attr-name">T</span><span class="token punctuation">></span></span> = {
     [P in K]: T;
 }
 
-const userCollection: Record&lt;UserId, User&gt; = {
-    &#39;1&#39;: {
-        id: &#39;1&#39;,
-        name: &#39;John Doe&#39;,
+const userCollection: Record<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>UserId,</span> <span class="token attr-name">User</span><span class="token punctuation">></span></span> = {
+    '1': {
+        id: '1',
+        name: 'John Doe',
     }
 }
 
@@ -852,103 +803,96 @@ type Props = {
 
 declare function MyComponent(props: Props): ReactNode
 
-type GetComponentProps&lt;T extends (props: any) =&gt; ReactNode&gt; = Parameters&lt;T&gt;[0]
+type GetComponentProps&lt;T extends (props: any) => ReactNode> = Parameters<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>T</span><span class="token punctuation">></span></span>[0]
 
-type CompProps = GetComponentProps&lt;typeof MyComponent&gt; // Props
-</code></pre>
-<h2 id="generics-syntax"><a href="#generics-syntax">Generics syntax</a></h2>
-<h3 id="generic-types"><a href="#generic-types">generic types</a></h3>
-<pre><code class="language-typescript">// @flow
+type CompProps = GetComponentProps<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>typeof</span> <span class="token attr-name">MyComponent</span><span class="token punctuation">></span></span> // Props</code></pre>
+<h2><a href="#generics-syntax">Generics syntax</a></h2>
+<h3><a href="#generic-types">generic types</a></h3>
+<pre class="language-typescript"><code class="language-typescript">// @flow
 
-type ToTuple&lt;T&gt; = [T]
+type ToTuple<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>T</span><span class="token punctuation">></span></span> = [T]
 
-type ToStringTuple&lt;T: string&gt; = [T]
+type ToStringTuple<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">T:</span></span> <span class="token attr-name">string</span><span class="token punctuation">></span></span> = [T]
 
-type ToDefaultToStringTuple&lt;T = &#39;B&#39;&gt; = [T]
+type ToDefaultToStringTuple&lt;T = 'B'> = [T]
 
-type ToTogetherTuple&lt;T: string = &#39;C&#39;&gt; = [T]
+type ToTogetherTuple<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">T:</span></span> <span class="token attr-name">string</span> <span class="token attr-value"><span class="token punctuation attr-equals">=</span> <span class="token punctuation">'</span>C<span class="token punctuation">'</span></span><span class="token punctuation">></span></span> = [T]
 
-type A = ToStringTuple&lt;&#39;A&#39;&gt;
+type A = ToStringTuple<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>'A'</span><span class="token punctuation">></span></span>
 
-type B = ToDefaultToStringTuple&lt;&gt;
+type B = ToDefaultToStringTuple&lt;>
 
-type C = ToTogetherTuple&lt;string&gt;
+type C = ToTogetherTuple<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>string</span><span class="token punctuation">></span></span>
 
-const a: A = [&#39;A&#39;]
+const a: A = ['A']
 
-const b: B = [&#39;B&#39;]
+const b: B = ['B']
 
-const c: C = [&#39;F&#39;]
-</code></pre>
-<pre><code class="language-typescript">// typescript
+const c: C = ['F']</code></pre>
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
-type ToTuple&lt;T&gt; = [T]
+type ToTuple<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>T</span><span class="token punctuation">></span></span> = [T]
 
-type ToStringTuple&lt;T extends string&gt; = [T]
+type ToStringTuple<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>T</span> <span class="token attr-name">extends</span> <span class="token attr-name">string</span><span class="token punctuation">></span></span> = [T]
 
-type ToDefaultToStringTuple&lt;T = &#39;B&#39;&gt; = [T]
+type ToDefaultToStringTuple&lt;T = 'B'> = [T]
 
-type ToTogetherTuple&lt;T extends string = &#39;C&#39;&gt; = [T]
+type ToTogetherTuple<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>T</span> <span class="token attr-name">extends</span> <span class="token attr-name">string</span> <span class="token attr-value"><span class="token punctuation attr-equals">=</span> <span class="token punctuation">'</span>C<span class="token punctuation">'</span></span><span class="token punctuation">></span></span> = [T]
 
-type A = ToStringTuple&lt;&#39;A&#39;&gt;
+type A = ToStringTuple<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>'A'</span><span class="token punctuation">></span></span>
 
-type _B = ToDefaultToStringTuple&lt;&gt;
+type _B = ToDefaultToStringTuple&lt;>
 //                              ^^ error: cannot be empty
 
-type B = ToDefaultToStringTuple&lt;string&gt;
+type B = ToDefaultToStringTuple<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>string</span><span class="token punctuation">></span></span>
 
-type C = ToTogetherTuple&lt;string&gt;
+type C = ToTogetherTuple<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>string</span><span class="token punctuation">></span></span>
 
-const a: A = [&#39;A&#39;]
+const a: A = ['A']
 
-const b: B = [&#39;B&#39;]
+const b: B = ['B']
 
-const c: C = [&#39;F&#39;]
-</code></pre>
-<h3 id="generic-functions"><a href="#generic-functions">generic functions</a></h3>
-<pre><code class="language-typescript">// @flow
+const c: C = ['F']</code></pre>
+<h3><a href="#generic-functions">generic functions</a></h3>
+<pre class="language-typescript"><code class="language-typescript">// @flow
 
-declare function foo&lt;T&gt;(arg: T): {foo: T}
+declare function foo<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>T</span><span class="token punctuation">></span></span>(arg: T): {foo: T}
 
-declare function bar&lt;T: string&gt;(arg: T): {bar: T}
+declare function bar<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">T:</span></span> <span class="token attr-name">string</span><span class="token punctuation">></span></span>(arg: T): {bar: T}
 
-declare function baz&lt;T: string = &#39;&#39;&gt;(arg: T): {baz: T}
-</code></pre>
-<pre><code class="language-typescript">// typescript
+declare function baz<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">T:</span></span> <span class="token attr-name">string</span> <span class="token attr-value"><span class="token punctuation attr-equals">=</span> <span class="token punctuation">'</span><span class="token punctuation">'</span></span><span class="token punctuation">></span></span>(arg: T): {baz: T}</code></pre>
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
-declare function foo&lt;T&gt;(arg: T): {foo: T}
+declare function foo<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>T</span><span class="token punctuation">></span></span>(arg: T): {foo: T}
 
-declare function bar&lt;T extends string&gt;(arg: T): {bar: T}
+declare function bar<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>T</span> <span class="token attr-name">extends</span> <span class="token attr-name">string</span><span class="token punctuation">></span></span>(arg: T): {bar: T}
 
-declare function baz&lt;T extends string = &#39;&#39;&gt;(arg: T): {baz: T}
-</code></pre>
+declare function baz<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>T</span> <span class="token attr-name">extends</span> <span class="token attr-name">string</span> <span class="token attr-value"><span class="token punctuation attr-equals">=</span> <span class="token punctuation">'</span><span class="token punctuation">'</span></span><span class="token punctuation">></span></span>(arg: T): {baz: T}</code></pre>
 <hr>
-<pre><code class="language-typescript">// @flow
+<pre class="language-typescript"><code class="language-typescript">// @flow
 
-declare function easy&lt;T: {a: string}&gt;(arg: T): T
+declare function easy<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">T:</span></span> <span class="token attr-name"><span class="token namespace">{a:</span></span> <span class="token attr-name">string}</span><span class="token punctuation">></span></span>(arg: T): T
 
-const aaa = easy({a: &#39;&#39;, b: 42}) // ok
+const aaa = easy({a: '', b: 42}) // ok
 
 aaa // {|a: string, b: number|}
 
-declare function strict&lt;T: {|a: string|}&gt;(arg: T): T
+declare function strict<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">T:</span></span> <span class="token attr-name"><span class="token namespace">{|a:</span></span> <span class="token attr-name">string|}</span><span class="token punctuation">></span></span>(arg: T): T
 
-const bbb = strict({a: &#39;&#39;, b: 42}) // error
+const bbb = strict({a: '', b: 42}) // error
 
-const ccc = strict({a: &#39;&#39;}) // ok
+const ccc = strict({a: ''}) // ok
 
-ccc // {|a: string|}
-</code></pre>
-<pre><code class="language-typescript">// typescript
+ccc // {|a: string|}</code></pre>
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
-declare function func&lt;T extends {a: string}&gt;(arg: T): T
+declare function func<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>T</span> <span class="token attr-name">extends</span> <span class="token attr-name"><span class="token namespace">{a:</span></span> <span class="token attr-name">string}</span><span class="token punctuation">></span></span>(arg: T): T
 
-const qlwerk = func({a: &#39;&#39;, b: 42}) // ok
+const qlwerk = func({a: '', b: 42}) // ok
 
-qlwerk // {a: string, b: number}
-</code></pre>
-<h2 id="generic-type-variance"><a href="#generic-type-variance">Generic type variance</a></h2>
-<pre><code class="language-typescript">// @flow
+qlwerk // {a: string, b: number}</code></pre>
+<h2><a href="#generic-type-variance">Generic type variance</a></h2>
+<pre class="language-typescript"><code class="language-typescript">// @flow
 
 type A = {|a: string|}
 
@@ -956,7 +900,7 @@ type AB = {|a: string, b: string|}
 
 type ABC = {|a: string, b: string, c: string|}
 
-declare function takesAB&lt;T: AB&gt;(arg: T): void
+declare function takesAB<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">T:</span></span> <span class="token attr-name">AB</span><span class="token punctuation">></span></span>(arg: T): void
 
 declare var a__: A
 declare var ab_: AB
@@ -966,10 +910,9 @@ takesAB(a__) // error
 
 takesAB(ab_) // ok
 
-takesAB(abc) // error
-</code></pre>
+takesAB(abc) // error</code></pre>
 <p>⚠️ Typescript generics are covariant and there&#39;s nothing one can do about it</p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 type A = {a: string}
 
@@ -977,7 +920,7 @@ type AB = {a: string, b: string}
 
 type ABC = {a: string, b: string, c: string}
 
-declare function takesAB&lt;T extends AB&gt;(arg: T): void
+declare function takesAB<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>T</span> <span class="token attr-name">extends</span> <span class="token attr-name">AB</span><span class="token punctuation">></span></span>(arg: T): void
 
 declare var a__: A
 declare var ab_: AB
@@ -987,17 +930,16 @@ takesAB(a__) // error
 
 takesAB(ab_) // ok
 
-takesAB(abc) // ok
-</code></pre>
+takesAB(abc) // ok</code></pre>
 <p>While in flow generics are invariant by default, but one <a href="https://flow.org/en/docs/types/generics/#toc-variance-sigils">can specify</a> if they want it to behave covariant or contravariant.</p>
-<h2 id="type-variance"><a href="#type-variance">Type variance</a></h2>
+<h2><a href="#type-variance">Type variance</a></h2>
 <p><strong>Flow</strong>:</p>
 <ul>
 <li>see <a href="https://flow.org/en/docs/lang/variance/">flow docs</a></li>
 <li>allows you to make types covariant or contravariant <a href="https://flow.org/en/docs/types/generics/#toc-variance-sigils">docs</a></li>
 </ul>
 <p><strong>Typescript</strong></p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 class Noun {}
 class City extends Noun {}
@@ -1014,11 +956,10 @@ method({}) // proof
 
 method([]) // 😳
 
-method(&#39;foo&#39;) // still an object
+method('foo') // still an object
 
-method(null) // err
-</code></pre>
-<pre><code class="language-typescript">// typescript
+method(null) // err</code></pre>
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 class Noun {
     count() { }
@@ -1035,10 +976,9 @@ method(new SanFrancisco()) // ok
 method({}) // error
 
 method({ count() {} }) // ok
-method(Object.assign([], { count() {} })) // ok
-</code></pre>
+method(Object.assign([], { count() {} })) // ok</code></pre>
 <p>covariant like check</p>
-<pre><code class="language-typescript">// typescript
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 class Noun {
     constructor(public name: string) {}
@@ -1056,50 +996,45 @@ class SanFrancisco extends City {
 
 declare function method(value: City): void
 
-method(new Noun(&#39;moscow&#39;))                 // error
-method(new City(&#39;moscow&#39;, 42))             // ok
-method(new SanFrancisco(&#39;moscow&#39;, 42, &#39;&#39;)) // ok
-</code></pre>
-<h3 id="conditional-types"><a href="#conditional-types">Conditional types</a></h3>
-<pre><code class="language-typescript">// typescript
+method(new Noun('moscow'))                 // error
+method(new City('moscow', 42))             // ok
+method(new SanFrancisco('moscow', 42, '')) // ok</code></pre>
+<h3><a href="#conditional-types">Conditional types</a></h3>
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
-type IsString&lt;T&gt; = T extends string ? true : false
+type IsString<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>T</span><span class="token punctuation">></span></span> = T extends string ? true : false
 
-type A = IsString&lt;string&gt; // true
+type A = IsString<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>string</span><span class="token punctuation">></span></span> // true
 
-type B = IsString&lt;{}&gt; // false
-</code></pre>
-<h3 id="infer"><a href="#infer">Infer</a></h3>
-<pre><code class="language-typescript">// typescript
+type B = IsString<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>{}</span><span class="token punctuation">></span></span> // false</code></pre>
+<h3><a href="#infer">Infer</a></h3>
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
-type ElementType&lt;A&gt; = A extends Array&lt;infer U&gt; ? U : never
+type ElementType<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>A</span><span class="token punctuation">></span></span> = A extends Array<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>infer</span> <span class="token attr-name">U</span><span class="token punctuation">></span></span> ? U : never
 
-type A = ElementType&lt;string&gt; // never
+type A = ElementType<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>string</span><span class="token punctuation">></span></span> // never
 
-type B = ElementType&lt;[&#39;A&#39;, &#39;B&#39;]&gt; // &#39;A&#39; | &#39;B&#39;
-</code></pre>
-<pre><code class="language-typescript">// typescript
+type B = ElementType<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>['A',</span> <span class="token attr-name">'B']</span><span class="token punctuation">></span></span> // 'A' | 'B'</code></pre>
+<pre class="language-typescript"><code class="language-typescript">// typescript
 
 declare function add(a: string, b: string): string
 declare function add(a: number, b: number): number
 declare function add(a: string | number, b: string | number): string | number
 
-type SillyResult = ReturnType&lt;typeof add&gt; // string | number
+type SillyResult = ReturnType<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>typeof</span> <span class="token attr-name">add</span><span class="token punctuation">></span></span> // string | number
 
-type SmartReturnType&lt;F, A extends Array&lt;any&gt;&gt; = F extends (...args: A) =&gt; infer R ? R : never
+type SmartReturnType<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>F,</span> <span class="token attr-name">A</span> <span class="token attr-name">extends</span> <span class="token attr-name">Array&lt;any</span><span class="token punctuation">></span></span>> = F extends (...args: A) => infer R ? R : never
 
-type NotThatSilly = SmartReturnType&lt;typeof add, [string, string]&gt; // string | number
+type NotThatSilly = SmartReturnType<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>typeof</span> <span class="token attr-name">add,</span> <span class="token attr-name">[string,</span> <span class="token attr-name">string]</span><span class="token punctuation">></span></span> // string | number
 
-type AtLeastWeHaveThis = SmartReturnType&lt;typeof add, [string, number]&gt; // never
-</code></pre>
-<pre><code class="language-typescript">// @flow
+type AtLeastWeHaveThis = SmartReturnType<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>typeof</span> <span class="token attr-name">add,</span> <span class="token attr-name">[string,</span> <span class="token attr-name">number]</span><span class="token punctuation">></span></span> // never</code></pre>
+<pre class="language-typescript"><code class="language-typescript">// @flow
 
 declare function add(a: string, b: string): string
 declare function add(a: number, b: number): number
 declare function add(a: string | number, b: string | number): string | number
 
-type Returns = $Call&lt;typeof add, string, string&gt; // string
-</code></pre>
+type Returns = $Call<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>typeof</span> <span class="token attr-name">add,</span> <span class="token attr-name">string,</span> <span class="token attr-name">string</span><span class="token punctuation">></span></span> // string</code></pre>
 
     </article>
 </body>
