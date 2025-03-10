@@ -22,7 +22,7 @@
     "gray-matter": "^4.0.3",
     "marked": "^14.0.0",
     "marked-gfm-heading-id": "^4.0.1",
-    "prismjs": "^1.29.0",
+    "prismjs": "^1.30.0",
     "tsx": "^4.17.0"
   }
 }
