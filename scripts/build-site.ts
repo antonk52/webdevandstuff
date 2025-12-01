@@ -36,7 +36,7 @@ type ItemEntry = {
 }
 
 // filepaths of posts that use codebloks with languages
-const prismJsSet = new Set<string>();
+const prismCodeBlockSet = new Set<string>();
 
 // replace the heading content with a link to the heading id
 const getMarkedOpts = (filepath: string): MarkedOptions => ({
@@ -51,7 +51,7 @@ const getMarkedOpts = (filepath: string): MarkedOptions => ({
                         if (t.lang === 'ts') {
                             t.lang = 'typescript';
                         }
-                        if (t.lang && ['javascript', 'typescript'].includes(t.lang)) prismJsSet.add(filepath)
+                        if (t.lang && ['javascript', 'typescript', 'lua'].includes(t.lang)) prismCodeBlockSet.add(filepath)
                         return t;
                     case 'heading':
                         if (t.tokens?.length == 1 && t.tokens[0].type === 'text') {
@@ -83,9 +83,28 @@ marked.use(gfmHeadingId({}));
 
 const renderer = new marked.Renderer();
 
+const prismGrammarMap: Prism.LanguageMap = {
+    ...Prism.languages,
+    lua: {
+        comment: [/--\[\[.*\]\]/m, {
+            pattern: /--.*/,
+            greedy: true
+        } ],
+        string: {
+            pattern: /(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
+            greedy: true
+        },
+        keyword: /\b(?:and|break|do|else|elseif|end|false|for|function|if|in|local|nil|not|or|repeat|return|then|true|until|while)\b/,
+        function: /\b\w+(?=\s*\()/,
+        number: /\b0x[\da-f]+\b|(?:\b\d+(?:\.\d*)?|\B\.\d+)(?:e[+-]?\d+)?/i,
+        operator: /[<>]=?|[!=]=?=?|--?|\+\+?|&&?|\|\|?|[?*/~^%]/,
+        punctuation: /[{}[\];(),.:]/
+    } as Prism.Grammar,
+} as Prism.LanguageMap;
+
 renderer.code = ({text, lang}) => {
-    const grammar = Prism.languages[lang ?? ''] || Prism.languages.markup; // Fallback to markup if language not found
-    const highlighted = (lang && ['ts','tsx', 'typescript', 'javascript'].includes(lang)) ? Prism.highlight(text, grammar, lang) : text;
+    const grammar = prismGrammarMap[lang ?? ''] || prismGrammarMap.markup; // Fallback to markup if language not found
+    const highlighted = (lang && ['ts','tsx', 'typescript', 'javascript', 'lua'].includes(lang)) ? Prism.highlight(text, grammar, lang) : text;
     return `<pre class="language-${lang}"><code class="language-${lang}">${highlighted}</code></pre>\n`;
 };
 
@@ -268,7 +287,7 @@ function surroundWithHtml(content: string, data: PostMeta, filepath: string) {
             text-decoration: none;
         }
     </style>
-    ${prismJsSet.has(filepath) ? primsJsAssets : ''}
+    ${prismCodeBlockSet.has(filepath) ? primsJsAssets : ''}
 </head>
 
 <body>
