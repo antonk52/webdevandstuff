@@ -3,5 +3,6 @@ _site
 .jekyll-metadata
 node_modules
 *.swp
+.DS_Store
 drafts
 dist

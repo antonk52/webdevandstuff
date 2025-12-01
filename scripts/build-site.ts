@@ -15,10 +15,12 @@ const __dirname = path.dirname(__filename)
 const DIST_FOLDER = path.resolve(__dirname, '../dist');
 const DIST_POSTS = path.resolve(__dirname, '../dist/post');
 const DIST_WIKI = path.resolve(__dirname, '../dist/wiki');
+const DIST_ASSETS = path.resolve(__dirname, '../dist/assets');
 
 const SRC_POSTS = path.resolve(__dirname, '../posts');
 const SRC_WIKI = path.resolve(__dirname, '../wiki');
 const SRC_IMAGES = path.resolve(__dirname, '../images');
+const SRC_ASSETS = path.resolve(__dirname, '../assets');
 
 type PostMeta = {
     title?: string;
@@ -120,6 +122,18 @@ marked.setOptions({ renderer });
     console.log('> creating dist folder');
     await fs.promises.mkdir(DIST_POSTS, { recursive: true });
     await fs.promises.mkdir(DIST_WIKI, { recursive: true });
+    await fs.promises.mkdir(DIST_ASSETS, { recursive: true });
+
+    await fs.promises.readdir(SRC_ASSETS).then(
+        files => Promise.all(
+            files.map(file => fs.promises.copyFile(
+                path.resolve(SRC_ASSETS, file),
+                path.resolve(DIST_ASSETS, file),
+            ))
+        )
+    );
+
+    await fs.promises.mkdir(DIST_FOLDER, { recursive: true });
 
     // read the posts folder
     console.log('> reading posts');

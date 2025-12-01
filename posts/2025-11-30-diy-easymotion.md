@@ -15,7 +15,7 @@ Before we jump into implementation, for extra challenge I wanted to implement it
 
 For example, if I want to jump to the `I`, I type `I` followed by a space. That puts a label on the first letter of the next word. Now you type the label for the I that you want to jump to.
 
-![easy motion demo](https://github.com/user-attachments/assets/3f727c5d-721a-455c-b69c-424e61fd7513)
+![easy motion demo](../assets/easy-motion.gif)
 
 The coolest part is that to implement this yourself you will only need to know about a handful of neovim APIs.
 
