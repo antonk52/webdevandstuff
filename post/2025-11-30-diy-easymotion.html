@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DIY EasyMotion</title>
+    <meta name="description" content="I tried reimplementing an easy motion style jump feature in neovim and learned that you can do it in just 60 lines of lua.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.6.1/github-markdown.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+            box-sizing: border-box;
+            margin: 0;
+        }
+
+        .markdown-body {
+            min-width: 200px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0d1117;
+            }
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --fgColor-default: #e6edf3;
+            }
+        }
+        @media (prefers-color-scheme: light) {
+            :root {
+                --fgColor-default: #1f2328;
+            }
+        }
+
+        header {
+            display: flex;
+            gap: 24px;
+            border-bottom: 1px solid #e1e4e8;
+            padding: 16px 24px;
+        }
+        header a {
+            color: var(--fgColor-default);
+        }
+        .markdown-body h1 > a,
+        .markdown-body h2 > a,
+        .markdown-body h3 > a,
+        .markdown-body h4 > a,
+        .markdown-body h5 > a,
+        .markdown-body h6 > a {
+            color: var(--fgColor-default);
+            text-decoration: none;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+
+<body>
+    <header>
+        <a href="/webdevandstuff">Web dev and stuff</a>
+        <a href="https://github.com/antonk52" target="_blank">GitHub</a>
+        <a href="https://twitter.com/antonk52" target="_blank">Twitter</a>
+    </header>
+
+    <article class="markdown-body">
+        <h1>DIY EasyMotion</h1>
+        
+        <p>I tried reimplementing an easy motion style jump feature in neovim and learned that you can do it in just 60 lines of lua.</p>
+<h2><a href="#rationale">Rationale</a></h2>
+<p>Over a decade ago I used the <a href="https://packagecontrol.io/packages/EasyMotion">EasyMotion plugin</a> in Sublime Text. About that time I started toying with vim. The built-in modal editing and navigation features were fascinating so I did not consider looking into easy motion plugins for vim for many years. A decade later I was reminded of EasyMotion and decided to include it for the rare occasions when it is more convenient.</p>
+<p>There are plenty of EasyMotion-like options available for neovim. The OGs <a href="https://github.com/easymotion/vim-easymotion">vim-easymotion</a> and <a href="https://github.com/justinmk/vim-sneak">vim-sneak</a> and some of the modern alternatives <a href="https://github.com/ggandor/leap.nvim">leap.nvim</a>, <a href="https://github.com/folke/flash.nvim">flash.nvim</a>, <a href="https://github.com/nvim-mini/mini.nvim/blob/main/readmes/mini-jump2d.md">mini-jump2d</a>. I&#39;ve tried them all and while all work as advertised. None hit that sweet spot. Maybe my memory is hazy or the workflow changed is different now. Some use entire window than the current buffer split, others place labels over the character I want to jump to which breaks my mental flow. As a result, I decided to give it a try to re-implement it myself to my exact liking.</p>
+<p>Before we jump into implementation, for extra challenge I wanted to implement it per my memory without verifying if that&#39;s exactly how the sublime plugin works. My requirements were to jump to any character on the screen by typing the char to jump to, the next char, and the next char get&#39;s highlighted a <em>single</em> label.</p>
+<p>For example, if I want to jump to the <code>I</code>, I type <code>I</code> followed by a space. That puts a label on the first letter of the next word. Now you type the label for the I that you want to jump to.</p>
+<p><img src="https://github.com/user-attachments/assets/3f727c5d-721a-455c-b69c-424e61fd7513" alt="easy motion demo"></p>
+<p>The coolest part is that to implement this yourself you will only need to know about a handful of neovim APIs.</p>
+<ul>
+<li><a href="https://neovim.io/doc/user/vimfn.html#getchar()"><code>:h getchar()</code></a> - a way to block editor and get next typed character from user</li>
+<li><a href="https://neovim.io/doc/user/api.html#extmarks"><code>:h extmarks</code></a> - a way to pin something virtual and display it along the code without modifying the buffer content</li>
+<li><a href="https://neovim.io/doc/user/lua.html#vim.schedule()"><code>:h vim.schedule()</code></a> - schedule a callback to run on the next event loop iteration</li>
+</ul>
+<h2><a href="#make-it-work">Make it work</a></h2>
+<p>Now let&#39;s go into the implementation</p>
+<pre class="language-lua"><code class="language-lua"><span class="token comment">-- namespace for the extmarks. It will make it easier to clean up later</span>
+<span class="token keyword">local</span> EASYMOTION_NS <span class="token operator">=</span> vim<span class="token punctuation">.</span>api<span class="token punctuation">.</span><span class="token function">nvim_create_namespace</span><span class="token punctuation">(</span><span class="token string">'EASYMOTION_NS'</span><span class="token punctuation">)</span>
+<span class="token comment">-- Characters to use as labels. Note how we only use the letters from lower</span>
+<span class="token comment">-- to upper case in ascending order of how easy to type them in qwerty layout</span>
+<span class="token keyword">local</span> EM_CHARS <span class="token operator">=</span> vim<span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">'fjdkslgha;rueiwotyqpvbcnxmzFJDKSLGHARUEIWOTYQPVBCNXMZ'</span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span>
+
+<span class="token keyword">local</span> <span class="token keyword">function</span> <span class="token function">easy_motion</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token comment">-- implementation will go here</span>
+<span class="token keyword">end</span>
+
+vim<span class="token punctuation">.</span>keymap<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>
+    <span class="token punctuation">{</span> <span class="token string">'n'</span><span class="token punctuation">,</span> <span class="token string">'x'</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">-- trigger it in normal and visual modes</span>
+    <span class="token string">'S'</span><span class="token punctuation">,</span> <span class="token comment">-- trigger search on</span>
+    easy_motion<span class="token punctuation">,</span>
+    <span class="token punctuation">{</span> desc <span class="token operator">=</span> <span class="token string">'Jump to 2 characters'</span> <span class="token punctuation">}</span>
+<span class="token punctuation">)</span></code></pre>
+<p>From the requirements we already know how we want to implement the <code>easy_motion</code> function.</p>
+<ol>
+<li>We get 2 characters typed by the user</li>
+<li>Label all the matching positions on the screen</li>
+<li>Listen for user input to pick the location to jump to</li>
+<li>Jump to the location or cancel on any other key</li>
+<li>Clean up the labels</li>
+</ol>
+<pre class="language-lua"><code class="language-lua"><span class="token comment">-- 1. Get 2 characters typed by the user</span>
+
+<span class="token comment">-- since getchar() returns key code, we need to covert it to character string using `nr2char()`</span>
+<span class="token keyword">local</span> char1 <span class="token operator">=</span> vim<span class="token punctuation">.</span>fn<span class="token punctuation">.</span><span class="token function">nr2char</span><span class="token punctuation">(</span>vim<span class="token punctuation">.</span>fn<span class="token punctuation">.</span><span class="token function">getchar</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">local</span> char2 <span class="token operator">=</span> vim<span class="token punctuation">.</span>fn<span class="token punctuation">.</span><span class="token function">nr2char</span><span class="token punctuation">(</span>vim<span class="token punctuation">.</span>fn<span class="token punctuation">.</span><span class="token function">getchar</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<pre class="language-lua"><code class="language-lua"><span class="token comment">-- 2. Label all the matching positions on the screen</span>
+
+<span class="token comment">-- To locate characters on the screen, we need the screen boundaries.</span>
+<span class="token comment">-- Buffer content does not always fit on the screen size</span>
+
+<span class="token comment">-- First line displayed on the screen</span>
+<span class="token keyword">local</span> line_idx_start <span class="token operator">=</span> vim<span class="token punctuation">.</span>fn<span class="token punctuation">.</span><span class="token function">line</span><span class="token punctuation">(</span><span class="token string">'w0'</span><span class="token punctuation">)</span>
+<span class="token comment">-- Last line displayed on the screen</span>
+<span class="token keyword">local</span> line_idx_end <span class="token operator">=</span>  vim<span class="token punctuation">.</span>fn<span class="token punctuation">.</span><span class="token function">line</span><span class="token punctuation">(</span><span class="token string">'w$'</span><span class="token punctuation">)</span>
+
+<span class="token comment">-- to keep track of labels to use</span>
+<span class="token keyword">local</span> char_idx <span class="token operator">=</span> <span class="token number">1</span>
+<span class="token comment">-- dictionary of extmarks so we can refer back to picked location, from label char to location</span>
+<span class="token comment">---@type table&lt;string, {line: integer, col: integer, id: integer}></span>
+<span class="token keyword">local</span> extmarks <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token comment">-- lines on the screen</span>
+<span class="token comment">-- `line_idx_start - 1` to convert from 1 based to 0 based index</span>
+<span class="token keyword">local</span> lines <span class="token operator">=</span> vim<span class="token punctuation">.</span>api<span class="token punctuation">.</span><span class="token function">nvim_buf_get_lines</span><span class="token punctuation">(</span>bufnr<span class="token punctuation">,</span> line_idx_start <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">,</span> line_idx_end<span class="token punctuation">,</span> <span class="token keyword">false</span><span class="token punctuation">)</span>
+<span class="token comment">-- the needle we are looking for</span>
+<span class="token keyword">local</span> needle <span class="token operator">=</span> char1 <span class="token punctuation">.</span><span class="token punctuation">.</span> char2
+
+<span class="token keyword">for</span> line_i<span class="token punctuation">,</span> line_text <span class="token keyword">in</span> <span class="token function">ipairs</span><span class="token punctuation">(</span>lines<span class="token punctuation">)</span> <span class="token keyword">do</span>
+    <span class="token keyword">local</span> line_idx <span class="token operator">=</span> line_i <span class="token operator">+</span> line_idx_start <span class="token operator">-</span> <span class="token number">1</span>
+
+    <span class="token comment">-- since a single line can contain multiple matches, let's brute force each position</span>
+    <span class="token keyword">for</span> i <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">,</span> #line_text <span class="token keyword">do</span>
+        <span class="token comment">-- once we find a match, put an extmark there</span>
+        <span class="token keyword">if</span> line_text<span class="token punctuation">:</span><span class="token function">sub</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">==</span> needle <span class="token keyword">and</span> char_idx <span class="token operator">&lt;=</span> #EM_CHARS <span class="token keyword">then</span>
+            <span class="token keyword">local</span> overlay_char <span class="token operator">=</span> EM_CHARS<span class="token punctuation">[</span>char_idx<span class="token punctuation">]</span>
+            <span class="token comment">-- line number, `-2` to convert from 1 based to 0 based index</span>
+            <span class="token keyword">local</span> linenr <span class="token operator">=</span> line_idx_start <span class="token operator">+</span> line_i <span class="token operator">-</span> <span class="token number">2</span>
+            <span class="token comment">-- column number, `-1` to convert from 1 based to 0 based index</span>
+            <span class="token keyword">local</span> col <span class="token operator">=</span> i <span class="token operator">-</span> <span class="token number">1</span>
+            <span class="token comment">-- set the extmark with virtual text overlay</span>
+            <span class="token comment">-- We specify the buffer, namespace, position, and options</span>
+            <span class="token comment">-- use `col + 2` to position the label 2 characters after the match</span>
+            <span class="token keyword">local</span> id <span class="token operator">=</span> vim<span class="token punctuation">.</span>api<span class="token punctuation">.</span><span class="token function">nvim_buf_set_extmark</span><span class="token punctuation">(</span>bufnr<span class="token punctuation">,</span> EASYMOTION_NS<span class="token punctuation">,</span> linenr<span class="token punctuation">,</span> col <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+                <span class="token comment">-- text we want to overlay the character</span>
+                virt_text <span class="token operator">=</span> <span class="token punctuation">{</span> <span class="token punctuation">{</span> overlay_char<span class="token punctuation">,</span> <span class="token string">'CurSearch'</span> <span class="token punctuation">}</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+                <span class="token comment">-- how to position the virtual text, we use `overlay` to cover the existing content</span>
+                virt_text_pos <span class="token operator">=</span> <span class="token string">'overlay'</span><span class="token punctuation">,</span>
+                <span class="token comment">-- use `replace` to ignore the highlighting of the content below and only use the highlight group specified in `virt_text`</span>
+                hl_mode <span class="token operator">=</span> <span class="token string">'replace'</span><span class="token punctuation">,</span>
+            <span class="token punctuation">}</span><span class="token punctuation">)</span>
+            <span class="token comment">-- save the extmark info to jump to it if selected</span>
+            extmarks<span class="token punctuation">[</span>overlay_char<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span> line <span class="token operator">=</span> linenr<span class="token punctuation">,</span> col <span class="token operator">=</span> col<span class="token punctuation">,</span> id <span class="token operator">=</span> id <span class="token punctuation">}</span>
+            <span class="token comment">-- increment the label index</span>
+            char_idx <span class="token operator">=</span> char_idx <span class="token operator">+</span> <span class="token number">1</span>
+        <span class="token keyword">end</span>
+    <span class="token keyword">end</span>
+<span class="token keyword">end</span></code></pre>
+<pre class="language-lua"><code class="language-lua"><span class="token comment">-- 3. Listen for user input to pick the location to jump to</span>
+
+<span class="token comment">-- Before block editor to listen for user input, we need to allow neovim to draw the labels.</span>
+<span class="token comment">-- We can user `vim.schedule` to allow neovim to process pending UI updates.</span>
+vim<span class="token punctuation">.</span><span class="token function">schedule</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token comment">-- Get the next character typed by the user</span>
+    <span class="token keyword">local</span> pick_char <span class="token operator">=</span> vim<span class="token punctuation">.</span>fn<span class="token punctuation">.</span><span class="token function">nr2char</span><span class="token punctuation">(</span>vim<span class="token punctuation">.</span>fn<span class="token punctuation">.</span><span class="token function">getchar</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> extmarks<span class="token punctuation">[</span>pick_char<span class="token punctuation">]</span> <span class="token keyword">then</span>
+        <span class="token comment">-- 4. Jump to the location</span>
+        <span class="token keyword">local</span> target <span class="token operator">=</span> extmarks<span class="token punctuation">[</span>pick_char<span class="token punctuation">]</span>
+        vim<span class="token punctuation">.</span>api<span class="token punctuation">.</span><span class="token function">nvim_win_set_cursor</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> target<span class="token punctuation">.</span>line <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> target<span class="token punctuation">.</span>col <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token keyword">end</span>
+
+    <span class="token comment">-- 5. Clean up the labels</span>
+    vim<span class="token punctuation">.</span>api<span class="token punctuation">.</span><span class="token function">nvim_buf_clear_namespace</span><span class="token punctuation">(</span>bufnr<span class="token punctuation">,</span> EASYMOTION_NS<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+<span class="token keyword">end</span><span class="token punctuation">)</span></code></pre>
+<h2><a href="#make-it-better">Make it better</a></h2>
+<p>At this point we have all the basics down. There are still a few more improvements we can make</p>
+<p>First let&#39;s handle <strong>concealed lines</strong>, no need to put search and label hidden content</p>
+<pre class="language-lua"><code class="language-lua"><span class="token comment">-- Make sure we only label visible lines</span>
+<span class="token keyword">if</span> vim<span class="token punctuation">.</span>fn<span class="token punctuation">.</span><span class="token function">foldclosed</span><span class="token punctuation">(</span>line_idx<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1</span> <span class="token keyword">then</span>
+    <span class="token comment">-- check line content ...</span>
+<span class="token keyword">end</span></code></pre>
+<p>I enjoy <code>smartcase</code> for search using <code>/</code>. Let&#39;s make our implementation act similar - enables case sensitivity if needle contains an uppercase character</p>
+<pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> needle <span class="token operator">=</span> char1 <span class="token punctuation">.</span><span class="token punctuation">.</span> char2
+<span class="token comment">-- if needle has any uppercase letters, make the search case sensitive</span>
+<span class="token keyword">local</span> is_case_sensitive <span class="token operator">=</span> needle <span class="token operator">~</span><span class="token operator">=</span> string<span class="token punctuation">.</span><span class="token function">lower</span><span class="token punctuation">(</span>needle<span class="token punctuation">)</span>
+
+<span class="token keyword">for</span> line_i<span class="token punctuation">,</span> line_text <span class="token keyword">in</span> <span class="token function">ipairs</span><span class="token punctuation">(</span>lines<span class="token punctuation">)</span> <span class="token keyword">do</span>
+    <span class="token keyword">if</span> <span class="token keyword">not</span> is_case_sensitive <span class="token keyword">then</span>
+        <span class="token comment">-- for case insensitive search, convert line to lower case so we can match on all content</span>
+        line_text <span class="token operator">=</span> string<span class="token punctuation">.</span><span class="token function">lower</span><span class="token punctuation">(</span>line_text<span class="token punctuation">)</span>
+    <span class="token keyword">end</span>
+
+    <span class="token comment">-- check line content ...</span>
+<span class="token keyword">end</span></code></pre>
+<p>Sometimes you want to go back, <code>&lt;C-o&gt;</code> does just that. We need to support jumplist. We need to add a mark in jump list, we can do it in a single line</p>
+<pre class="language-lua"><code class="language-lua">vim<span class="token punctuation">.</span><span class="token function">cmd</span><span class="token punctuation">(</span><span class="token string">"normal! m'"</span><span class="token punctuation">)</span></code></pre>
+<p>Right now we continue looking for matches even after we ran out of labels. Some plugins start using labels with multiple characters. I never have my terminal font size large enough. So let&#39;s exit early once we used up all labels.</p>
+<pre class="language-lua"><code class="language-lua"><span class="token keyword">if</span> char_idx <span class="token operator">></span> #EM_CHARS <span class="token keyword">then</span>
+    <span class="token keyword">break</span>
+<span class="token keyword">end</span></code></pre>
+<h2><a href="#final-code">Final code</a></h2>
+<p>Slightly cleaned up and just 60 lines of lua with all improvements included</p>
+<pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> EASYMOTION_NS <span class="token operator">=</span> vim<span class="token punctuation">.</span>api<span class="token punctuation">.</span><span class="token function">nvim_create_namespace</span><span class="token punctuation">(</span><span class="token string">'EASYMOTION_NS'</span><span class="token punctuation">)</span>
+<span class="token keyword">local</span> EM_CHARS <span class="token operator">=</span> vim<span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">'fjdkslgha;rueiwotyqpvbcnxmzFJDKSLGHARUEIWOTYQPVBCNXMZ'</span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span>
+
+<span class="token keyword">local</span> <span class="token keyword">function</span> <span class="token function">easy_motion</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">local</span> char1 <span class="token operator">=</span> vim<span class="token punctuation">.</span>fn<span class="token punctuation">.</span><span class="token function">nr2char</span><span class="token punctuation">(</span> vim<span class="token punctuation">.</span>fn<span class="token punctuation">.</span><span class="token function">getchar</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment">--[[@as number]]</span> <span class="token punctuation">)</span>
+    <span class="token keyword">local</span> char2 <span class="token operator">=</span> vim<span class="token punctuation">.</span>fn<span class="token punctuation">.</span><span class="token function">nr2char</span><span class="token punctuation">(</span> vim<span class="token punctuation">.</span>fn<span class="token punctuation">.</span><span class="token function">getchar</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment">--[[@as number]]</span> <span class="token punctuation">)</span>
+    <span class="token keyword">local</span> line_idx_start<span class="token punctuation">,</span> line_idx_end <span class="token operator">=</span> vim<span class="token punctuation">.</span>fn<span class="token punctuation">.</span><span class="token function">line</span><span class="token punctuation">(</span><span class="token string">'w0'</span><span class="token punctuation">)</span><span class="token punctuation">,</span> vim<span class="token punctuation">.</span>fn<span class="token punctuation">.</span><span class="token function">line</span><span class="token punctuation">(</span><span class="token string">'w$'</span><span class="token punctuation">)</span>
+    <span class="token keyword">local</span> bufnr <span class="token operator">=</span> vim<span class="token punctuation">.</span>api<span class="token punctuation">.</span><span class="token function">nvim_get_current_buf</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    vim<span class="token punctuation">.</span>api<span class="token punctuation">.</span><span class="token function">nvim_buf_clear_namespace</span><span class="token punctuation">(</span>bufnr<span class="token punctuation">,</span> EASYMOTION_NS<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">local</span> char_idx <span class="token operator">=</span> <span class="token number">1</span>
+    <span class="token comment">---@type table&lt;string, {line: integer, col: integer, id: integer}></span>
+    <span class="token keyword">local</span> extmarks <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    <span class="token keyword">local</span> lines <span class="token operator">=</span> vim<span class="token punctuation">.</span>api<span class="token punctuation">.</span><span class="token function">nvim_buf_get_lines</span><span class="token punctuation">(</span>bufnr<span class="token punctuation">,</span> line_idx_start <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">,</span> line_idx_end<span class="token punctuation">,</span> <span class="token keyword">false</span><span class="token punctuation">)</span>
+    <span class="token keyword">local</span> needle <span class="token operator">=</span> char1 <span class="token punctuation">.</span><span class="token punctuation">.</span> char2
+
+    <span class="token keyword">local</span> is_case_sensitive <span class="token operator">=</span> needle <span class="token operator">~</span><span class="token operator">=</span> string<span class="token punctuation">.</span><span class="token function">lower</span><span class="token punctuation">(</span>needle<span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> lines_i<span class="token punctuation">,</span> line_text <span class="token keyword">in</span> <span class="token function">ipairs</span><span class="token punctuation">(</span>lines<span class="token punctuation">)</span> <span class="token keyword">do</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> is_case_sensitive <span class="token keyword">then</span>
+            line_text <span class="token operator">=</span> string<span class="token punctuation">.</span><span class="token function">lower</span><span class="token punctuation">(</span>line_text<span class="token punctuation">)</span>
+        <span class="token keyword">end</span>
+        <span class="token keyword">local</span> line_idx <span class="token operator">=</span> lines_i <span class="token operator">+</span> line_idx_start <span class="token operator">-</span> <span class="token number">1</span>
+        <span class="token comment">-- skip folded lines</span>
+        <span class="token keyword">if</span> vim<span class="token punctuation">.</span>fn<span class="token punctuation">.</span><span class="token function">foldclosed</span><span class="token punctuation">(</span>line_idx<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1</span> <span class="token keyword">then</span>
+            <span class="token keyword">for</span> i <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">,</span> #line_text <span class="token keyword">do</span>
+                <span class="token keyword">if</span> line_text<span class="token punctuation">:</span><span class="token function">sub</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">==</span> needle <span class="token keyword">and</span> char_idx <span class="token operator">&lt;=</span> #EM_CHARS <span class="token keyword">then</span>
+                    <span class="token keyword">local</span> overlay_char <span class="token operator">=</span> EM_CHARS<span class="token punctuation">[</span>char_idx<span class="token punctuation">]</span>
+                    <span class="token keyword">local</span> linenr <span class="token operator">=</span> line_idx_start <span class="token operator">+</span> lines_i <span class="token operator">-</span> <span class="token number">2</span>
+                    <span class="token keyword">local</span> col <span class="token operator">=</span> i <span class="token operator">-</span> <span class="token number">1</span>
+                    <span class="token keyword">local</span> id <span class="token operator">=</span> vim<span class="token punctuation">.</span>api<span class="token punctuation">.</span><span class="token function">nvim_buf_set_extmark</span><span class="token punctuation">(</span>bufnr<span class="token punctuation">,</span> EASYMOTION_NS<span class="token punctuation">,</span> linenr<span class="token punctuation">,</span> col <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+                        virt_text <span class="token operator">=</span> <span class="token punctuation">{</span> <span class="token punctuation">{</span> overlay_char<span class="token punctuation">,</span> <span class="token string">'CurSearch'</span> <span class="token punctuation">}</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+                        virt_text_pos <span class="token operator">=</span> <span class="token string">'overlay'</span><span class="token punctuation">,</span>
+                        hl_mode <span class="token operator">=</span> <span class="token string">'replace'</span><span class="token punctuation">,</span>
+                    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+                    extmarks<span class="token punctuation">[</span>overlay_char<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span> line <span class="token operator">=</span> linenr<span class="token punctuation">,</span> col <span class="token operator">=</span> col<span class="token punctuation">,</span> id <span class="token operator">=</span> id <span class="token punctuation">}</span>
+                    char_idx <span class="token operator">=</span> char_idx <span class="token operator">+</span> <span class="token number">1</span>
+                    <span class="token keyword">if</span> char_idx <span class="token operator">></span> #EM_CHARS <span class="token keyword">then</span>
+                        goto break_outer
+                    <span class="token keyword">end</span>
+                <span class="token keyword">end</span>
+            <span class="token keyword">end</span>
+        <span class="token keyword">end</span>
+    <span class="token keyword">end</span>
+    <span class="token punctuation">:</span><span class="token punctuation">:</span>break_outer<span class="token punctuation">:</span><span class="token punctuation">:</span>
+
+    <span class="token comment">-- otherwise setting extmarks and waiting for next char is on the same frame</span>
+    vim<span class="token punctuation">.</span><span class="token function">schedule</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">local</span> next_char <span class="token operator">=</span> vim<span class="token punctuation">.</span>fn<span class="token punctuation">.</span><span class="token function">nr2char</span><span class="token punctuation">(</span>vim<span class="token punctuation">.</span>fn<span class="token punctuation">.</span><span class="token function">getchar</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment">--[[@as number]]</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> extmarks<span class="token punctuation">[</span>next_char<span class="token punctuation">]</span> <span class="token keyword">then</span>
+            <span class="token keyword">local</span> pos <span class="token operator">=</span> extmarks<span class="token punctuation">[</span>next_char<span class="token punctuation">]</span>
+            <span class="token comment">-- to make &lt;C-o> work</span>
+            vim<span class="token punctuation">.</span><span class="token function">cmd</span><span class="token punctuation">(</span><span class="token string">"normal! m'"</span><span class="token punctuation">)</span>
+            vim<span class="token punctuation">.</span>api<span class="token punctuation">.</span><span class="token function">nvim_win_set_cursor</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> pos<span class="token punctuation">.</span>line <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> pos<span class="token punctuation">.</span>col <span class="token punctuation">}</span><span class="token punctuation">)</span>
+        <span class="token keyword">end</span>
+        <span class="token comment">-- clear extmarks</span>
+        vim<span class="token punctuation">.</span>api<span class="token punctuation">.</span><span class="token function">nvim_buf_clear_namespace</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> EASYMOTION_NS<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+    <span class="token keyword">end</span><span class="token punctuation">)</span>
+<span class="token keyword">end</span>
+
+vim<span class="token punctuation">.</span>keymap<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token string">'n'</span><span class="token punctuation">,</span> <span class="token string">'x'</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">'S'</span><span class="token punctuation">,</span> easy_motion<span class="token punctuation">,</span> <span class="token punctuation">{</span> desc <span class="token operator">=</span> <span class="token string">'Jump to 2 characters'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span></code></pre>
+<h2><a href="#conclusion">Conclusion</a></h2>
+<p>I have two main takeaways from this exercise. Trying to implement an existing plugin functionality usually leaves you with a better understanding of available neovim APIs. If successful, you also end up with a more precise solution for your exact use case.</p>
+<p>Modern neovim is great. Happy hacking</p>
+
+    </article>
+</body>
+</html>
